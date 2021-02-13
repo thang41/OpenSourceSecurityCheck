@@ -1,6 +1,6 @@
 import os
 import win32api # Used for the 'findDrives()' function. Not used though, but could be implemented here or somewhere else later
-import re # need to test keywords in each string
+import re # needed to test keywords in each string
 
 
 
