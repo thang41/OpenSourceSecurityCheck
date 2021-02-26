@@ -1,12 +1,6 @@
 import os
-import win32api # Used for the 'findDrives()' function. Not used though, but could be implemented here or somewhere else later
 import re # needed to test keywords in each string
 
-def findDrives():
-    #make sure to import win32api at the top
-    drives = win32api.GetLogicalDriveStrings()
-    drives = drives.split('\000')[:-1]
-    print(drives)
     
 def iterateThroughFilesFolders(): # This will iterate through a chosen directory to get filenames
     fileListWithDirectory = []
