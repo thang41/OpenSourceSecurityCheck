@@ -11,7 +11,7 @@ def findDrives():
 def iterateThroughFilesFolders(): # This will iterate through a chosen directory to get filenames
     fileListWithDirectory = []
  
-    for root, path, file in os.walk("D://Test//"):
+    for root, path, file in os.walk("C://"):
         for filename in file:
             if root[-2:-1] == '/':
                 fileListWithDirectory.append(root+filename)
