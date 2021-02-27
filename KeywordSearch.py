@@ -40,8 +40,7 @@ def keyWordSearch(x):
                 continue # Continues
 
 def main():
-    #findDrives()
     keyWordSearch(iterateThroughFilesFolders())
 
-
-main()
+if __name__ == "__main__":
+    main()
