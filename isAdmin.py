@@ -21,7 +21,7 @@ is_admin, groups = if_user_is_admin(server)
 
 # Result handeling
 if is_admin == True:
-    print('You are a admin user!')
+    print('You are an admin user!')
 else:
     print('You are not an admin user.')
 print('You are in the following groups:')
