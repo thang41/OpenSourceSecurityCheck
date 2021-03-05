@@ -2,12 +2,13 @@ import tkinter as tk
 from tkinter import ttk, filedialog, END
 import time, string, timer, scanner
 
+#test
+
 class Application(tk.Frame):
     #directory = tk.StringVar()
     foundFiles = []
     folder_selected = ''
     
-
     def __init__(self, root):
         self.root = root
         self.initialize_user_interface()
