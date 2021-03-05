@@ -2,8 +2,6 @@ import tkinter as tk
 from tkinter import ttk, filedialog, END
 import time, string, timer, scanner
 
-
-
 class Application(tk.Frame):
     #directory = tk.StringVar()
     foundFiles = []
