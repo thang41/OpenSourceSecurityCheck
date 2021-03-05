@@ -64,7 +64,7 @@ class Application(tk.Frame):
         self.entry.insert(0,"C:/")
 
         # Browse Button
-        self.browseButton = ttk.Button(self.root, text='Browse..', command=lambda: self.browseButtonFunctions()) # 
+        self.browseButton = ttk.Button(self.root, text='Browse..', command=lambda: self.browseButtonActions()) # 
         self.browseButton.place(x=40,y=165)
 
         # Scan Button
