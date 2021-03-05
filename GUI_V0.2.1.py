@@ -7,6 +7,7 @@ class Application(tk.Frame):
     foundFiles = []
     folder_selected = ''
     
+
     def __init__(self, root):
         self.root = root
         self.initialize_user_interface()
