@@ -45,7 +45,7 @@ class Scanner:
     def ssnSearch(self,d):
 
         #ssn format: xxxxxxxxx or xxx-xx-xxxx      
-        ssnFound = re.findall(r'(?!000|.+0{4})(?:\d{9}|\d{3}-\d{2}-\d{4})', d)
+        ssnFound = re.findall(r'(?<!\d)(?!000|.+0{4})(?:\d{9}|\d{3}-\d{2}-\d{4})(?!\d)', d)
         for i in ssnFound:
             if len(ssnFound) < 1:
                 pass
