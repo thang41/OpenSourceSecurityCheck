@@ -32,7 +32,8 @@ class Scanner:
              d = i.read_text()
              for word in wordList:
                  if word in d.lower():
-                     print("Found:",word," In:",i,"Contents:",d)
+                     pass
+                     #print("Found:",word," In:",i,"Contents:",d)
              self.ssnSearch(d)
         
         for word in wordList:
@@ -40,14 +41,16 @@ class Scanner:
                 if i:
                     return True
     
-    
+    # searching for SSNs
     def ssnSearch(self,d):
-            #ssn format: xxxxxxxxx or xxx-xx-xxxx
-           # print("this is D",d)
-            for i in d:
-               # print("this is eye",i)
-                print(bool(re.match(r'^(?!000|.+0{4})(?:\d{9}|\d{3}-\d{2}-\d{4})$', i)))
 
+        #ssn format: xxxxxxxxx or xxx-xx-xxxx      
+        ssnFound = re.findall(r'(?!000|.+0{4})(?:\d{9}|\d{3}-\d{2}-\d{4})', d)
+        for i in ssnFound:
+            if len(ssnFound) < 1:
+                pass
+            else:
+                print("Possible SSN:",i)
 
 
     def get_scanning(self):
