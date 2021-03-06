@@ -92,7 +92,7 @@ class Application(tk.Frame):
         self.notebook.add(self.notebookTab1, text='  Files  ')
 
         self.notebookTab2 = ttk.Frame(self.notebook)
-        self.notebook.add(self.notebookTab2, text='  Treeview  ')
+        self.notebook.add(self.notebookTab2, text='File Types')
 
         self.notebookTab3 = ttk.Frame(self.notebook)
         self.notebook.add(self.notebookTab3, text='  Other  ')
@@ -106,7 +106,8 @@ class Application(tk.Frame):
         self.treeview.heading("#0", text="File Categories", anchor='w')
 
         self.treeview.insert(parent='', index='end', iid=1, text="Text Files")
-        self.treeview.insert(parent='', index='end', iid=2, text="Unknown Type")
+        self.treeview.insert(parent='', index='end', iid=2, text="Graphical Files")
+        self.treeview.insert(parent='', index='end', iid=3, text="Unknown Type")
         #self.treeview.item(1, open=True)
 
         self.iid = 3
@@ -152,10 +153,12 @@ class Application(tk.Frame):
             self.text.insert(tk.END,str(timer1.getTime()) + ' Seconds\n\n')
             
             for x in foundFiles:
-                if x.match("*.txt"):
+                if x.match("*.txt") or x.match("*.doc"):
                     self.insert_data(x,1)
-                else:
+                elif x.match("*.jpg") or x.match("*.png") or x.match("*.jpeg"):
                     self.insert_data(x,2)
+                else:
+                    self.insert_data(x,3)
 
                 self.text.insert(tk.END, str(x) +'\n')
 

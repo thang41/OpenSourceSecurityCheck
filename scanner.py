@@ -18,7 +18,7 @@ class Scanner:
         #file_and_contents = {} # Dictionary decleration
 
         wordList = ['important','password','private','bank',
-            'hidden','phone','credit','card','paypal',
+            'hidden','phone','credit card','paypal',
             'email','backup','nude','hidden','porn',
             'finance','purchase','delete','mastercard',
             'visa','passport','identification',
@@ -29,12 +29,15 @@ class Scanner:
             'doctor','medic','money','key']
 
         if i.match("*.txt"): # Finding and reading in text files for keywords
-             d = i.read_text()
-             for word in wordList:
-                 if word in d.lower():
-                     pass
-                     #print("Found:",word," In:",i,"Contents:",d)
-             self.ssnSearch(d)
+            try:
+                d = i.read_text()
+                for word in wordList:
+                    if word in d.lower():
+                        pass
+                        #print("Found:",word," In:",i,"Contents:",d)
+                self.ssnSearch(d)
+            except UnicodeDecodeError:
+                print("Can't read file:",i.name)
         
         for word in wordList:
             if word in str(i.name).lower(): # checking filename
