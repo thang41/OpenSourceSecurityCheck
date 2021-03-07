@@ -1,11 +1,11 @@
-import os
-import win32api
-
+import pathlib
 
 def findDrives():
-    #requires win23api import
-    drives = win32api.GetLogicalDriveStrings()
-    drives = drives.split('\000')[:-1]
-    print(drives)
+    driveList = ['a','b','c','d','e','f','g','h','i','j','k','l',
+    'm','n','o','p','q','r','s','t','u','v','w','x','y','z']
+
+    for drive in driveList:
+        if pathlib.Path(drive + ":/").exists():
+            print("Found drive:",drive)
 
 findDrives()
