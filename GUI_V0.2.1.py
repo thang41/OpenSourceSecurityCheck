@@ -26,9 +26,9 @@ class Application(tk.Frame):
         # Create a style
         self.style = ttk.Style(self.root)
 
-        # Import the tcl file then Set the theme with the theme_use method
-        self.root.tk.call('source', 'azure-dark.tcl')
-        self.style.theme_use('azure-dark')
+        # # Import the tcl file then Set the theme with the theme_use method
+        # self.root.tk.call('source', 'azure-dark.tcl')
+        # self.style.theme_use('azure-dark')
 
         # Create control variables
         self.a = tk.IntVar()
@@ -153,9 +153,9 @@ class Application(tk.Frame):
             self.text.insert(tk.END,str(timer1.getTime()) + ' Seconds\n\n')
             
             for x in foundFiles:
-                if x.match("*.txt") or x.match("*.doc"):
+                if x.match("*.txt") or x.match("*.doc") or x.match("*.rtf"):
                     self.insert_data(x,1)
-                elif x.match("*.jpg") or x.match("*.png") or x.match("*.jpeg"):
+                elif x.match("*.jpg") or x.match("*.png") or x.match("*.jpeg") or x.match("*.gif"):
                     self.insert_data(x,2)
                 else:
                     self.insert_data(x,3)
