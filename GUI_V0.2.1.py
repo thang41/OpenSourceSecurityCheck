@@ -14,7 +14,7 @@ class Application(tk.Frame):
 
     def initialize_user_interface(self):
         #Configuring root object of the application
-        self.root.title("Open Source Security Check")
+        self.root.title("Open-Source Security Check")
         self.windowWidth = 1460
         self.windowHeight = 840
         self.screenWidth = self.root.winfo_screenwidth()
@@ -26,7 +26,7 @@ class Application(tk.Frame):
         # Create a style
         self.style = ttk.Style(self.root)
 
-        # # Import the tcl file then Set the theme with the theme_use method
+        # Import the tcl file then Set the theme with the theme_use method
         # self.root.tk.call('source', 'azure-dark.tcl')
         # self.style.theme_use('azure-dark')
 
@@ -151,9 +151,11 @@ class Application(tk.Frame):
             timer1.stopTimer()
 
             self.text.insert(tk.END,str(timer1.getTime()) + ' Seconds\n\n')
+
+            textFileType = ['*.txt','*.doc*','*.rtf']
             
             for x in foundFiles:
-                if x.match("*.txt") or x.match("*.doc") or x.match("*.rtf"):
+                if x.match("*.txt") or x.match("*.doc*") or x.match("*.rtf"):
                     self.insert_data(x,1)
                 elif x.match("*.jpg") or x.match("*.png") or x.match("*.jpeg") or x.match("*.gif"):
                     self.insert_data(x,2)

@@ -26,7 +26,7 @@ class Scanner:
             'confidential','discover','secret','personal',
             'secure','registration','doctor','taxes',
             'financial','pin ','receipt','vin ','tax','resume',
-            'doctor','medic','money','key']
+            'doctor','medic','money','key','contacts']
 
         if i.match("*.txt"): # Finding and reading in text files for keywords
             try:
