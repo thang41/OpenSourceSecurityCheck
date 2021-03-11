@@ -83,7 +83,7 @@ class Application(tk.Frame):
         self.exitButton.place(x=335,y=220)
 
         # TEMP BUTTON
-        self.tempButton = ttk.Button(self.root, text='Options', command=self.optionsButtonActions())
+        self.tempButton = ttk.Button(self.root, text='Options', command=lambda: self.clear_tree())
         self.tempButton.place(x=190,y=220)
 
         # Notebook
@@ -108,9 +108,9 @@ class Application(tk.Frame):
         
         self.treeview.heading("#0", text="File Categories", anchor='w')
 
-        self.treeview.insert(parent='', index='end', iid=1, text="Text Files")
-        self.treeview.insert(parent='', index='end', iid=2, text="Graphical Files")
-        self.treeview.insert(parent='', index='end', iid=3, text="Unknown Type")
+        self.treeview.insert(parent='', index='end', iid=1, text="Documents" )
+        self.treeview.insert(parent='', index='end', iid=2, text="Graphics")
+        self.treeview.insert(parent='', index='end', iid=3, text="Unknown")
         #self.treeview.item(1, open=True)
 
         self.iid = 3
@@ -131,6 +131,9 @@ class Application(tk.Frame):
 
         self.lbl_3 = ttk.Label(self.infoframe, text=" • Partial scan allows you to define the directory.")
         self.lbl_3.place(x=7, y=60)
+
+        self.lbl_4 = ttk.Label(self.infoframe, text="Scan time: ")
+        self.lbl_4.place(x=7, y=100)
 
         # Bind our functions to the Treeview.
         self.treeview.bind("<Button-3>", self.preClick)
@@ -161,13 +164,12 @@ class Application(tk.Frame):
             self.onRight_menu.place_forget()
 
         # This is the function that removes the selected item when the label is clicked.
-        def delete(*args):
+        def removeFromDir(*args):
             selection = self.treeview.focus()
-            print("THis is selection:",selection)
-            print(self.treeview.item(selection[0]))
-            #self.treeview.delete(selection)
+            tempDict = self.treeview.item(selection)
+            print(tempDict['text'])
             scan1 = scanner.Scanner()
-            scan1.ignoreThisDirectory(selection)
+            scan1.ignoreThisDirectory(tempDict['text'])
             
             try:
                 self.onRight_menu.destroy()
@@ -175,7 +177,7 @@ class Application(tk.Frame):
                 pass
             
 
-        delLabel.bind("<Button-1>", delete)
+        delLabel.bind("<Button-1>", removeFromDir)
 
     # This is to prevent infinite right click menus; it sees if there is an existing menu
     # and removes it, bringing it out in a new position.
@@ -227,7 +229,7 @@ class Application(tk.Frame):
 
             timer1.stopTimer()
 
-            self.text.insert(tk.END,str(timer1.getTime()) + ' Seconds\n\n')
+            self.lbl_4.config(text="Scan time: " + str(timer1.getTime()) + ' Seconds\n\n')
 
             textFileType = ['*.txt','*.doc*','*.rtf']
             
@@ -240,6 +242,17 @@ class Application(tk.Frame):
                     self.insert_data(x,3)
 
                 self.text.insert(tk.END, str(x) +'\n')
+        self.setTreeviewCounts()
+
+    # This will add how many of a particular item was found and at it after the name such as "Text Files (4)" if it found 4 text files.
+    def setTreeviewCounts(self):
+        num1 = str(len(self.treeview.get_children(1)))
+        num2 = str(len(self.treeview.get_children(2)))
+        num3 = str(len(self.treeview.get_children(3)))
+        self.treeview.item(1, text='Documents ( ' + num1 +' )')
+        self.treeview.item(2, text='Graphics ( ' + num2 +' )')
+        self.treeview.item(3, text='Unknown ( ' + num3 +' )')
+        # self.treeview.insert("", index='end',iid=1,text="Test"+num)
 
     # Browse button function call           
     def browseButtonActions(self):
@@ -252,6 +265,18 @@ class Application(tk.Frame):
     # Inserting data into treeview
     def insert_data(self,file, parentNumber):         
         self.treeview.insert(parent=parentNumber, index='end', text=str(file))
+    
+    def clear_tree(self):
+        children_count = 1
+        try:
+            while True:
+                for x in self.treeview.get_children(children_count):
+                    self.treeview.delete(x)
+                children_count += 1
+        except Exception:
+            pass
+            
+            
     
     # Pop up message
     # def popupmsg(self,msg):

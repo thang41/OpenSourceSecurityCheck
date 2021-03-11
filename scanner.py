@@ -30,13 +30,12 @@ class Scanner:
         wordList = ['important','password','private','bank',
             'hidden','phone','credit card','paypal',
             'email','backup','nude','hidden','porn',
-            'finance','purchase','mastercard',
-            'visa','passport','identification',
-            'username','login','ssn','secur',
-            'confidential','discover','secret','personal',
+            'finance','purchase','mastercard','passport','identification',
+            'username','login',
+            'confidential','secret','personal',
             'secure','registration','doctor','taxes',
-            'financial','pin ','receipt','vin ','tax','resume',
-            'doctor','medic','money','contact','sensitive']
+            'financial','receipt','taxes','resume',
+            'doctor','medical','money','contact','sensitive']
 
         if i.match("*.txt"): # Finding and reading in text files for keywords
             try:
@@ -56,6 +55,9 @@ class Scanner:
             else:
                 return True
     
+    
+
+    
     # searching for SSNs
     def ssnSearch(self,d):
 
@@ -69,7 +71,8 @@ class Scanner:
     
     # Ignore_dir.txt which will hold directories you want to ignore
     def readInDirectories(self):
-        f = open("ignored_dir.txt","r")
+        f = open("ignore_dir.txt","r")
+        print("IN read in directories:",f)
         for x in f:
             self.ignored_directories.append(x)
         f.close()
@@ -79,14 +82,16 @@ class Scanner:
     
     def ignoreThisDirectory(self,i):
         f = open("ignore_dir.txt","w")
-        print("This is i:",i)
-        f.write(i)
+
+        j = Path(i)
+        
+        
+        f.write(str(j.parents[0]))
         f.close()
     
+    # Setting path to scan
     def setPath(self,i):
         self.p = i
-        
-
 
     def get_scanning(self):
         return self.directory_file_iteration()
