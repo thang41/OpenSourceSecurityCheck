@@ -162,15 +162,18 @@ class Application(tk.Frame):
 
         # This is the function that removes the selected item when the label is clicked.
         def delete(*args):
-            selection = self.treeview.selection()
+            selection = self.treeview.focus()
+            print("THis is selection:",selection)
+            print(self.treeview.item(selection[0]))
             #self.treeview.delete(selection)
-            scan = scanner.Scanner(self.entry.get())
-            scan.ignoreThisDirectory(Path.parent(selection))
+            scan1 = scanner.Scanner()
+            scan1.ignoreThisDirectory(selection)
+            
             try:
                 self.onRight_menu.destroy()
             except Exception:
                 pass
-            print(selection,"Has been deleted")
+            
 
         delLabel.bind("<Button-1>", delete)
 
@@ -215,10 +218,11 @@ class Application(tk.Frame):
                 
         if self.checkRadiobutton() == 3:
             self.text.delete('1.0',END) # Remove what's currently in entry widget
-            scan = scanner.Scanner(self.entry.get()) # creating scan object
+            scan = scanner.Scanner() # creating scan object
             timer1 = timer.Timer()
             timer1.startTimer()
 
+            scan.setPath(self.entry.get())
             foundFiles = scan.get_scanning()
 
             timer1.stopTimer()

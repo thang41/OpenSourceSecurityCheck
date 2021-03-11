@@ -2,15 +2,18 @@ from pathlib import Path
 import re
 class Scanner:
 
+    
     ignored_directories = []
 
-    def __init__(self, p):
-        self.p = Path(p)
+    p = ''
+
+    def __init__(self):
+        pass
 
     def directory_file_iteration(self):
         self.readInDirectories()
         filesFound = []
-        for i in self.p.rglob("*"):
+        for i in Path(self.p).rglob("*"):
             if str(i.parents[0]) in self.ignored_directories: # allow you to ignore certain directories
                 print("Ignored", i)
                 pass
@@ -76,8 +79,13 @@ class Scanner:
     
     def ignoreThisDirectory(self,i):
         f = open("ignore_dir.txt","w")
+        print("This is i:",i)
         f.write(i)
         f.close()
+    
+    def setPath(self,i):
+        self.p = i
+        
 
 
     def get_scanning(self):
