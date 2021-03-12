@@ -135,6 +135,8 @@ class Application(tk.Frame):
         self.lbl_4 = ttk.Label(self.infoframe, text="Scan time: ")
         self.lbl_4.place(x=7, y=100)
 
+        self.lbl_5 = ttk.Label(self.infoframe, text="Files Scanned: ")
+        self.lbl_5.place(x=7, y=125)
         # Bind our functions to the Treeview.
         self.treeview.bind("<Button-3>", self.preClick)
         self.treeview.bind("<Button-1>", self.onLeft)
@@ -246,12 +248,16 @@ class Application(tk.Frame):
 
     # This will add how many of a particular item was found and at it after the name such as "Text Files (4)" if it found 4 text files.
     def setTreeviewCounts(self):
-        num1 = str(len(self.treeview.get_children(1)))
-        num2 = str(len(self.treeview.get_children(2)))
-        num3 = str(len(self.treeview.get_children(3)))
-        self.treeview.item(1, text='Documents ( ' + num1 +' )')
-        self.treeview.item(2, text='Graphics ( ' + num2 +' )')
-        self.treeview.item(3, text='Unknown ( ' + num3 +' )')
+        
+        num1 = len(self.treeview.get_children(1))
+        num2 = len(self.treeview.get_children(2))
+        num3 = len(self.treeview.get_children(3))
+        totalFilesFound = num1 + num2 + num3
+        print("Total files found:",totalFilesFound)
+        self.treeview.item(1, text='Documents ( ' + str(num1) +' )')
+        self.treeview.item(2, text='Graphics ( ' + str(num2) +' )')
+        self.treeview.item(3, text='Unknown ( ' + str(num3) +' )')
+        self.lbl_5.config(text="Files Scanned: "+ str(totalFilesFound))
         # self.treeview.insert("", index='end',iid=1,text="Test"+num)
 
     # Browse button function call           

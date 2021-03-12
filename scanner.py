@@ -46,7 +46,11 @@ class Scanner:
                         #print("Found:",word," In:",i,"Contents:",d)
                 self.ssnSearch(d)
             except UnicodeDecodeError as e:
-                print("Error:",e,"Can't read file:",i)
+                print(i.name,"couldn't be read.")
+                # for word in wordList:
+                #     if word in line:
+                #         print("Found word", word,"in",i.name)
+                
         
         for word in wordList:
             if word in str(i.name).lower(): # checking filename
