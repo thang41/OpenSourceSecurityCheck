@@ -8,7 +8,6 @@ class Application(tk.Frame):
     folder_selected = ''
     full_scan = False # for the popup message, but I commeneted out so no use atm
     
-
     def __init__(self, root):
         self.root = root
         self.initialize_user_interface()
