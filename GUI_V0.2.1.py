@@ -48,6 +48,9 @@ class Application(tk.Frame):
         self.g = tk.IntVar(value=75)
         self.h = tk.IntVar()
 
+        #checkbox variable
+        self.var1 = tk.IntVar()
+
         # Frame for the Radiobuttons and entry 
         self.radioframe = tk.LabelFrame(self.root, text='Scan Type', width=410, height=200)
         self.radioframe.place(x=10, y=10)
@@ -92,7 +95,7 @@ class Application(tk.Frame):
 
         #Notebook tabs
         self.notebookTab1 = ttk.Frame(self.notebook)
-        self.notebook.add(self.notebookTab1, text='  Files  ')
+        self.notebook.add(self.notebookTab1, text='  Check  ')
 
         self.notebookTab2 = ttk.Frame(self.notebook)
         self.notebook.add(self.notebookTab2, text='File Types')
@@ -141,6 +144,10 @@ class Application(tk.Frame):
         self.treeview.bind("<Button-3>", self.preClick)
         self.treeview.bind("<Button-1>", self.onLeft)
 
+        # Checkbox for flagged files
+        self.flaggedCheckBox = ttk.Checkbutton(self.root, text="Flagged Files", variable=self.var1, onvalue=1, offvalue=0, command=lambda: self.checkboxActions())
+        self.flaggedCheckBox.place(x=630,y=20)
+
     # Right Click menu
     def onRight(self, *args):
         # Here we fetch our X and Y coordinates of the cursor RELATIVE to the window
@@ -180,6 +187,7 @@ class Application(tk.Frame):
             
 
         delLabel.bind("<Button-1>", removeFromDir)
+    
 
     # This is to prevent infinite right click menus; it sees if there is an existing menu
     # and removes it, bringing it out in a new position.
@@ -246,6 +254,15 @@ class Application(tk.Frame):
                 self.text.insert(tk.END, str(x) +'\n')
         self.setTreeviewCounts()
 
+    # checkbox so that you can filter all files by flagged
+    def checkboxActions(self):
+        if self.var1.get() == True:
+            print("Checkbox on")
+        if self.var1.get() == False:
+            print("Checkbox off")
+        else:
+            pass
+
     # This will add how many of a particular item was found and at it after the name such as "Text Files (4)" if it found 4 text files.
     def setTreeviewCounts(self):
         
@@ -272,6 +289,7 @@ class Application(tk.Frame):
     def insert_data(self,file, parentNumber):         
         self.treeview.insert(parent=parentNumber, index='end', text=str(file))
     
+    # This will clear the tree so when you scan again, the items in the tree will disappear
     def clear_tree(self):
         children_count = 1
         try:

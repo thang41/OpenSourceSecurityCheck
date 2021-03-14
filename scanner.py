@@ -3,24 +3,27 @@ import re
 class Scanner:
 
     
-    ignored_directories = []
+    
+    files = []
+
 
     p = ''
 
-    def __init__(self):
-        pass
 
     def directory_file_iteration(self):
-        self.readInDirectories()
+        ignored_directories = self.getIgnoredDirectories()
         filesFound = []
+        files = []
         for i in Path(self.p).rglob("*"):
-            if str(i.parents[0]) in self.ignored_directories: # allow you to ignore certain directories
+            if str(i.parents[0]) in ignored_directories: # allow you to ignore certain directories
                 print("Ignored", i)
                 pass
             else:
                 if i.is_file():
                     if self.keywordSearch(i):
                         filesFound.append(i)
+                        fileDict = {"filename":i.name,"path":i.parents[0], "filetype":Path(i).suffix, "flag":False, "reason":"NA"}
+                        files.append(fileDict)
         return filesFound
     
     def keywordSearch(self,i):
@@ -74,15 +77,14 @@ class Scanner:
                 print("Possible SSN:",i)
     
     # Ignore_dir.txt which will hold directories you want to ignore
-    def readInDirectories(self):
+    def getIgnoredDirectories(self):
+        ignored_directories = []
         f = open("ignore_dir.txt","r")
-        print("IN read in directories:",f)
         for x in f:
-            self.ignored_directories.append(x)
+            ignored_directories.append(x)
         f.close()
 
-        for i in self.ignored_directories:
-            print("Ignored dir:",i)
+        return ignored_directories
     
     def ignoreThisDirectory(self,i):
         f = open("ignore_dir.txt","w")
