@@ -7,7 +7,8 @@ class Application(tk.Frame):
     foundFiles = []
     folder_selected = ''
     full_scan = False # for the popup message, but I commeneted out so no use atm
-    
+    files_Global = []
+
     def __init__(self, root):
         self.root = root
         self.initialize_user_interface()
@@ -66,7 +67,7 @@ class Application(tk.Frame):
         # Entry
         self.entry = ttk.Entry(self.root, width=43)
         self.entry.place(x=132, y=165)
-        self.entry.insert(0,"C:/")
+        self.entry.insert(0,"")
 
         # Browse Button
         self.browseButton = ttk.Button(self.root, text='Browse..', command=lambda: self.browseButtonActions()) # 
@@ -85,7 +86,7 @@ class Application(tk.Frame):
         self.exitButton.place(x=335,y=220)
 
         # TEMP BUTTON
-        self.tempButton = ttk.Button(self.root, text='Options', command=lambda: self.clear_tree())
+        self.tempButton = ttk.Button(self.root, text='Options', state=tk.DISABLED)
         self.tempButton.place(x=190,y=220)
 
         # Notebook
@@ -94,10 +95,10 @@ class Application(tk.Frame):
 
         #Notebook tabs
         self.notebookTab1 = ttk.Frame(self.notebook)
-        self.notebook.add(self.notebookTab1, text='  Check  ')
+        self.notebook.add(self.notebookTab1, text='  Data  ')
 
         self.notebookTab2 = ttk.Frame(self.notebook)
-        self.notebook.add(self.notebookTab2, text='File Types')
+        self.notebook.add(self.notebookTab2, text='  File Types  ')
 
         self.notebookTab3 = ttk.Frame(self.notebook)
         self.notebook.add(self.notebookTab3, text='  Other  ')
@@ -144,7 +145,7 @@ class Application(tk.Frame):
         self.treeview.bind("<Button-1>", self.onLeft)
 
         # Checkbox for flagged files
-        self.flaggedCheckBox = ttk.Checkbutton(self.root, text="Flagged Files", variable=self.var1, onvalue=1, offvalue=0, command=lambda: self.checkboxActions())
+        self.flaggedCheckBox = ttk.Checkbutton(self.root, text="Flagged Files", variable=self.var1, onvalue=1, offvalue=0, command=lambda: self.sendToTreeFuncForWriting())
         self.flaggedCheckBox.place(x=630,y=20)
 
     # Right Click menu
@@ -175,7 +176,6 @@ class Application(tk.Frame):
         def removeFromDir(*args):
             selection = self.treeview.focus()
             tempDict = self.treeview.item(selection)
-            print(tempDict['text'])
             scan1 = scanner.Scanner()
             scan1.ignoreThisDirectory(tempDict['text'])
             
@@ -215,13 +215,11 @@ class Application(tk.Frame):
     
     # Scan button function call
     def scanButtonActions(self):
+        self.clear_tree()
         if self.checkRadiobutton() == 1:
-            # self.popupmsg("    This could take a very long time, continue?")
-
-            # if full_scan:
-            #     full_scan = False
-            #     print("Full Scan ititiated")
-
+            self.popupmsg("    This could take a very long time, continue?")
+            if full_scan:
+                full_scan = False
             pass
         
         if self.checkRadiobutton() == 2:
@@ -234,33 +232,60 @@ class Application(tk.Frame):
             timer1.startTimer()
 
             scan.setPath(self.entry.get())
-            foundFiles = scan.get_scanning()
+            files = scan.get_scanning()
+            self.files_Global = files
 
             timer1.stopTimer()
 
             self.lbl_4.config(text="Scan time: " + str(timer1.getTime()) + ' Seconds\n\n')
 
-            textFileType = ['*.txt','*.doc*','*.rtf']
             
-            for x in foundFiles:
-                if x.match("*.txt") or x.match("*.doc*") or x.match("*.rtf"):
-                    self.insert_data(x,1)
-                elif x.match("*.jpg") or x.match("*.png") or x.match("*.jpeg") or x.match("*.gif"):
-                    self.insert_data(x,2)
-                else:
-                    self.insert_data(x,3)
+            # inserting the files into the tree based on filename
+            self.sendToTreeFuncForWriting()
 
-                self.text.insert(tk.END, str(x) +'\n')
+            # Writing data to the textbox
+            self.writeToTextBox(files)
+            
+            
         self.setTreeviewCounts()
+    
+    # This will only send the right files based on the checkbox 
+    def sendToTreeFuncForWriting(self):
 
+        for file_ in self.files_Global:
+            if self.checkboxActions():
+                if file_["flag"]:
+                    self.writingToTree(file_)
+            if self.checkboxActions() == False:
+                self.writingToTree(file_)
+            else:
+                pass
+
+    # writing data to the tree
+    def writingToTree(self,file_):           
+            #if x["filename"] or x.match("*.doc*") or x.match("*.rtf"):
+            if file_["filetype"] in (".doc", "rtf", ".txt"):
+                self.insert_data(file_["filename"],1)
+            #elif x.match("*.jpg") or x.match("*.png") or x.match("*.jpeg") or x.match("*.gif"):
+            if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
+                self.insert_data(file_["filename"], 2)
+            else:
+                self.insert_data(file_["filename"],3)
+
+    # Write data to the text box widget
+    def writeToTextBox(self, files):
+        for file_ in files:
+            if file_["flag"] == True:
+                self.text.insert(tk.END, str(file_["data"])+"\n")
+                
     # checkbox so that you can filter all files by flagged
     def checkboxActions(self):
+        
         if self.var1.get() == True:
-            print("Checkbox on")
+            return True
         if self.var1.get() == False:
-            print("Checkbox off")
-        else:
-            pass
+            return False
+        
 
     # This will add how many of a particular item was found and at it after the name such as "Text Files (4)" if it found 4 text files.
     def setTreeviewCounts(self):
@@ -269,7 +294,6 @@ class Application(tk.Frame):
         num2 = len(self.treeview.get_children(2))
         num3 = len(self.treeview.get_children(3))
         totalFilesFound = num1 + num2 + num3
-        print("Total files found:",totalFilesFound)
         self.treeview.item(1, text='Documents ( ' + str(num1) +' )')
         self.treeview.item(2, text='Graphics ( ' + str(num2) +' )')
         self.treeview.item(3, text='Unknown ( ' + str(num3) +' )')
@@ -296,29 +320,27 @@ class Application(tk.Frame):
                 for x in self.treeview.get_children(children_count):
                     self.treeview.delete(x)
                 children_count += 1
-        except Exception:
+        except Exception as e:
             pass
             
-            
-    
     # Pop up message
-    # def popupmsg(self,msg):
-    #     popup = tk.Tk()
-    #     popup.title("Info")
-    #     popupWidth = 250
-    #     popupHeight = 100
-    #     screenWidth = self.root.winfo_screenwidth()
-    #     screenHeight = self.root.winfo_screenheight()
-    #     xCordinate = int((screenWidth/2) - (popupWidth/2))
-    #     yCordinate = int((screenHeight/2) - (popupHeight/2))
-    #     popup.geometry("{}x{}+{}+{}".format(popupWidth, popupHeight, xCordinate, yCordinate))
-    #     label = ttk.Label(popup, text=msg)
-    #     label.pack(side="top", fill="x", pady=10)
-    #     B1 = ttk.Button(popup, text="Scan", command=lambda: [self.popupmsgButtonActions(), popup.destroy()])
-    #     B1.place(x=10,y=50)
-    #     B2 = ttk.Button(popup, text="Quit", command=lambda: [popup.destroy()])
-    #     B2.place(x=120,y=50)
-    #     popup.mainloop()
+    def popupmsg(self,msg):
+        popup = tk.Tk()
+        popup.title("Info")
+        popupWidth = 250
+        popupHeight = 100
+        screenWidth = self.root.winfo_screenwidth()
+        screenHeight = self.root.winfo_screenheight()
+        xCordinate = int((screenWidth/2) - (popupWidth/2))
+        yCordinate = int((screenHeight/2) - (popupHeight/2))
+        popup.geometry("{}x{}+{}+{}".format(popupWidth, popupHeight, xCordinate, yCordinate))
+        label = ttk.Label(popup, text=msg)
+        label.pack()
+        B1 = ttk.Button(popup, text=" Scan ", command=lambda: [self.popupmsgButtonActions(), popup.destroy()])
+        B1.place(x=20,y=50)
+        B2 = ttk.Button(popup, text=" Quit ", command=lambda: [popup.destroy()])
+        B2.place(x=120,y=50)
+        popup.mainloop()
     
     # def popupmsgButtonActions(self):
     #     full_scan = True

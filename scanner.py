@@ -2,35 +2,8 @@ from pathlib import Path
 import re
 class Scanner:
 
-    
-    
-    files = []
-
-
-    p = ''
-
-
-    def directory_file_iteration(self):
-        ignored_directories = self.getIgnoredDirectories()
-        filesFound = []
-        files = []
-        for i in Path(self.p).rglob("*"):
-            if str(i.parents[0]) in ignored_directories: # allow you to ignore certain directories
-                print("Ignored", i)
-                pass
-            else:
-                if i.is_file():
-                    if self.keywordSearch(i):
-                        filesFound.append(i)
-                        fileDict = {"filename":i.name,"path":i.parents[0], "filetype":Path(i).suffix, "flag":False, "reason":"NA"}
-                        files.append(fileDict)
-        return filesFound
-    
-    def keywordSearch(self,i):
-
-        #file_and_contents = {} # Dictionary decleration
-
-        wordList = ['important','password','private','bank',
+    # word list. I might make this editable so someone can edit/add ones they want
+    wordList = ['important','password','private','bank',
             'hidden','phone','credit card','paypal',
             'email','backup','nude','hidden','porn',
             'finance','purchase','mastercard','passport','identification',
@@ -39,42 +12,82 @@ class Scanner:
             'secure','registration','doctor','taxes',
             'financial','receipt','taxes','resume',
             'doctor','medical','money','contact','sensitive']
+    
+    # this will store all of the file dictionsaries
+    files = []
 
-        if i.match("*.txt"): # Finding and reading in text files for keywords
-            try:
-                d = i.read_text(encoding='utf-8')
-                for word in wordList:
-                    if word in d.lower():
-                        pass
-                        #print("Found:",word," In:",i,"Contents:",d)
-                self.ssnSearch(d)
-            except UnicodeDecodeError as e:
-                print(i.name,"couldn't be read.")
-                # for word in wordList:
-                #     if word in line:
-                #         print("Found word", word,"in",i.name)
-                
+
+    p = ''
+
+
+    def directory_file_iteration(self):
+        ignored_directories = self.getIgnoredDirectories()
         
-        for word in wordList:
-            if word in str(i.name).lower(): # checking filename
-                if i:
-                    return True
-            else:
-                return True
-    
-    
-
-    
-    # searching for SSNs
-    def ssnSearch(self,d):
-
-        #ssn format: xxxxxxxxx or xxx-xx-xxxx      
-        ssnFound = re.findall(r'(?<!\d)(?!000|.+0{4})(?:\d{9}|\d{3}-\d{2}-\d{4})(?!\d)', d)
-        for i in ssnFound:
-            if len(ssnFound) < 1:
+        for i in Path(self.p).rglob("*"):
+            if str(i.parents[0]) in ignored_directories: # allow you to ignore certain directories
                 pass
             else:
-                print("Possible SSN:",i)
+                if i.is_file():
+                        fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
+                        self.files.append(fileDict)
+        
+        #return self.files
+    
+
+
+    # checking to see if a keyword is in a filename
+    def checkFileNames(self):
+        for file_ in self.files:
+            for word in self.wordList:
+                if word.lower() in str(file_["filename"].lower()):
+                    file_["flag"] = True
+                    file_["data"]["filename"] = word
+
+
+    # reading in .txt files and checking for keywords
+    def readInTextFile(self):
+        for file_ in self.files:
+            if file_["filetype"] == ".txt":
+                
+            
+                try: # trying to open the file, sometimes it won't read because it isn't always ascii characters. 
+                    f = open(file_["fullPath"], "r")
+                    fileContents = f.read()
+                    f.close()
+                    
+                    # searching the contents of the file for keyword
+                    for word in self.wordList:
+                        if word in fileContents.lower():
+                            file_["flag"] = True
+                            file_["data"]["filecontents"] = file_["data"]["filecontents"] + " " + word
+                    
+                    # searching contents of file for SSN
+                    file_ = self.ssnSearch(file_, fileContents)
+                    
+
+                except UnicodeDecodeError:
+                    pass            
+
+    # searching for SSNs
+    def ssnSearch(self,file_,fileContents):
+
+        #ssn format: xxxxxxxxx or xxx-xx-xxxx      
+        ssnFound = re.findall(r'(?<!\d)(?!000|.+0{4})(?:\d{9}|\d{3}-\d{2}-\d{4})(?!\d)', fileContents)
+
+        strSSNFOUND = ""
+
+        for ssn in ssnFound:
+            strSSNFOUND = strSSNFOUND + " " + ssn
+        
+        if len(ssnFound) < 1:
+            return file_
+        else:
+            file_["flag"] = True
+            file_["data"]["ssn"] = file_["data"]["ssn"] + strSSNFOUND
+
+            return file_
+        
+                
     
     # Ignore_dir.txt which will hold directories you want to ignore
     def getIgnoredDirectories(self):
@@ -100,6 +113,9 @@ class Scanner:
         self.p = i
 
     def get_scanning(self):
-        return self.directory_file_iteration()
+        self.files = [] # removing all data in the files list
+        self.directory_file_iteration()
+        self.checkFileNames()
+        self.readInTextFile()
         
-    
+        return self.files
