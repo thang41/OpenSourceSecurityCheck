@@ -145,7 +145,7 @@ class Application(tk.Frame):
         self.treeview.bind("<Button-1>", self.onLeft)
 
         # Checkbox for flagged files
-        self.flaggedCheckBox = ttk.Checkbutton(self.root, text="Flagged Files", variable=self.var1, onvalue=1, offvalue=0, command=lambda: self.sendToTreeFuncForWriting())
+        self.flaggedCheckBox = ttk.Checkbutton(self.root, text="Flagged Files", variable=self.var1, onvalue=1, offvalue=0, command=lambda: self.checkboxActions())
         self.flaggedCheckBox.place(x=630,y=20)
 
     # Right Click menu
@@ -239,38 +239,67 @@ class Application(tk.Frame):
 
             self.lbl_4.config(text="Scan time: " + str(timer1.getTime()) + ' Seconds\n\n')
 
-            
-            # inserting the files into the tree based on filename
-            self.sendToTreeFuncForWriting()
+            # Inserting into tree
+            self.writingToTree()
 
             # Writing data to the textbox
             self.writeToTextBox(files)
+
+            
             
             
         self.setTreeviewCounts()
     
     # This will only send the right files based on the checkbox 
-    def sendToTreeFuncForWriting(self):
-
-        for file_ in self.files_Global:
-            if self.checkboxActions():
-                if file_["flag"]:
-                    self.writingToTree(file_)
-            if self.checkboxActions() == False:
-                self.writingToTree(file_)
-            else:
-                pass
+    # def sendToTreeFuncForWriting(self):
+       
+    #     for file_ in self.files_Global:
+    #         if self.checkboxActions():
+    #             if file_["flag"]:
+    #                 self.writingToTree(file_)
+    #         if self.checkboxActions() == False:
+    #             self.writingToTree(file_)
+    #         else:
+    #             pass
 
     # writing data to the tree
-    def writingToTree(self,file_):           
-            #if x["filename"] or x.match("*.doc*") or x.match("*.rtf"):
-            if file_["filetype"] in (".doc", "rtf", ".txt"):
-                self.insert_data(file_["filename"],1)
-            #elif x.match("*.jpg") or x.match("*.png") or x.match("*.jpeg") or x.match("*.gif"):
-            if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
-                self.insert_data(file_["filename"], 2)
-            else:
-                self.insert_data(file_["filename"],3)
+    def writingToTree(self):
+        self.clear_tree()
+        if self.var1.get() == True:
+            for file_ in self.files_Global:
+                if file_["filetype"] in (".doc", "rtf", ".txt"):
+                    self.insert_data(file_["filename"],1)
+                    continue
+
+                if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
+                    self.insert_data(file_["filename"], 2)
+                    continue
+
+                else:
+                    self.insert_data(file_["filename"],3)
+                    continue
+
+        if self.var1.get() == False:
+            for file_ in self.files_Global:  
+                if file_["filetype"] in (".doc", ".rtf", ".txt"):
+                    self.insert_data(file_["filename"],1)
+                    continue
+
+                if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
+                    self.insert_data(file_["filename"], 2)
+                    continue
+
+                else:
+                    self.insert_data(file_["filename"],3)
+                    continue
+        else:
+            pass
+
+        self.setTreeviewCounts()
+
+    # checkbox so that you can filter all files by flagged
+    def checkboxActions(self):
+        self.writingToTree()
 
     # Write data to the text box widget
     def writeToTextBox(self, files):
@@ -278,13 +307,7 @@ class Application(tk.Frame):
             if file_["flag"] == True:
                 self.text.insert(tk.END, str(file_["data"])+"\n")
                 
-    # checkbox so that you can filter all files by flagged
-    def checkboxActions(self):
-        
-        if self.var1.get() == True:
-            return True
-        if self.var1.get() == False:
-            return False
+
         
 
     # This will add how many of a particular item was found and at it after the name such as "Text Files (4)" if it found 4 text files.
