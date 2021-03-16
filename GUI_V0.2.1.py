@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, END
 import time, string, timer, scanner
+from random import seed
+from random import random
 
 class Application(tk.Frame):
     #directory = tk.StringVar()
@@ -94,11 +96,11 @@ class Application(tk.Frame):
         self.notebook.place(x=440,y=19)
 
         #Notebook tabs
-        self.notebookTab1 = ttk.Frame(self.notebook)
-        self.notebook.add(self.notebookTab1, text='  Data  ')
+        # self.notebookTab1 = ttk.Frame(self.notebook)
+        # self.notebook.add(self.notebookTab1, text='  Data  ')
 
         self.notebookTab2 = ttk.Frame(self.notebook)
-        self.notebook.add(self.notebookTab2, text='  File Types  ')
+        self.notebook.add(self.notebookTab2, text='  File  ')
 
         self.notebookTab3 = ttk.Frame(self.notebook)
         self.notebook.add(self.notebookTab3, text='  Other  ')
@@ -119,8 +121,8 @@ class Application(tk.Frame):
         self.iid = 3
 
         # Text Output Box
-        self.text = tk.Text(self.notebookTab1, width=1000, height=780)
-        self.text.place(x=0,y=0)
+        # self.text = tk.Text(self.notebookTab1, width=1000, height=780)
+        # self.text.place(x=0,y=0)
 
         #Information Frame
         self.infoframe = ttk.LabelFrame(self.root, text='Information', width=410, height=570)
@@ -138,15 +140,18 @@ class Application(tk.Frame):
         self.lbl_4 = ttk.Label(self.infoframe, text="Scan time: ")
         self.lbl_4.place(x=7, y=100)
 
-        self.lbl_5 = ttk.Label(self.infoframe, text="Files Scanned: ")
+        self.lbl_5 = ttk.Label(self.infoframe, text="Total Files: ")
         self.lbl_5.place(x=7, y=125)
+
+        self.lbl_6 = ttk.Label(self.infoframe, text="Flagged files: ")
+        self.lbl_6.place(x=7, y=150)
         # Bind our functions to the Treeview.
         self.treeview.bind("<Button-3>", self.preClick)
         self.treeview.bind("<Button-1>", self.onLeft)
 
         # Checkbox for flagged files
         self.flaggedCheckBox = ttk.Checkbutton(self.root, text="Flagged Files", variable=self.var1, onvalue=1, offvalue=0, command=lambda: self.checkboxActions())
-        self.flaggedCheckBox.place(x=630,y=20)
+        self.flaggedCheckBox.place(x=550,y=20)
 
     # Right Click menu
     def onRight(self, *args):
@@ -217,16 +222,16 @@ class Application(tk.Frame):
     def scanButtonActions(self):
         self.clear_tree()
         if self.checkRadiobutton() == 1:
+            pass
+        
+        if self.checkRadiobutton() == 2:
             self.popupmsg("    This could take a very long time, continue?")
             if full_scan:
                 full_scan = False
             pass
-        
-        if self.checkRadiobutton() == 2:
-            pass
                 
         if self.checkRadiobutton() == 3:
-            self.text.delete('1.0',END) # Remove what's currently in entry widget
+            #self.text.delete('1.0',END) # Remove what's currently in entry widget
             scan = scanner.Scanner() # creating scan object
             timer1 = timer.Timer()
             timer1.startTimer()
@@ -241,61 +246,68 @@ class Application(tk.Frame):
 
             # Inserting into tree
             self.writingToTree()
-
-            # Writing data to the textbox
-            self.writeToTextBox(files)
-
             
-            
-            
+            # setting the total files scanned and flagged files labels in info box
+            self.setfileCountLabels()
+      
         self.setTreeviewCounts()
-    
-    # This will only send the right files based on the checkbox 
-    # def sendToTreeFuncForWriting(self):
-       
-    #     for file_ in self.files_Global:
-    #         if self.checkboxActions():
-    #             if file_["flag"]:
-    #                 self.writingToTree(file_)
-    #         if self.checkboxActions() == False:
-    #             self.writingToTree(file_)
-    #         else:
-    #             pass
 
-    # writing data to the tree
+    # this is the main code for writing data to the treeview
     def writingToTree(self):
         self.clear_tree()
+        
+        if self.var1.get() == False:
+            for file_ in self.files_Global:
+                self.writingToTreeCall(file_)
+
         if self.var1.get() == True:
             for file_ in self.files_Global:
-                if file_["filetype"] in (".doc", "rtf", ".txt"):
-                    self.insert_data(file_["filename"],1)
-                    continue
-
-                if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
-                    self.insert_data(file_["filename"], 2)
-                    continue
-
+                if file_["flag"] == True:
+                    self.writingToTreeCall(file_)
                 else:
-                    self.insert_data(file_["filename"],3)
-                    continue
-
-        if self.var1.get() == False:
-            for file_ in self.files_Global:  
-                if file_["filetype"] in (".doc", ".rtf", ".txt"):
-                    self.insert_data(file_["filename"],1)
-                    continue
-
-                if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
-                    self.insert_data(file_["filename"], 2)
-                    continue
-
-                else:
-                    self.insert_data(file_["filename"],3)
-                    continue
+                    pass
         else:
             pass
 
         self.setTreeviewCounts()
+
+    # this was necesarry to break up the code for the function above. Just made it look better
+    def writingToTreeCall(self,file_):
+        if file_["filetype"] in (".doc", ".rtf", ".txt","docx"):
+            self.insert_data(file_,1)
+            return
+
+        if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
+            self.insert_data(file_, 2)
+            return
+
+        else:
+            self.insert_data(file_,3)
+            return
+
+    # Inserting data into treeview
+    def insert_data(self,file_, parentNumber):
+        
+        if file_["flag"] == False:
+            self.treeview.insert(parent=parentNumber, index='end', text=str(file_["filename"]))
+        else:
+            ranNum = random()
+            self.treeview.insert(parent=parentNumber, iid=ranNum, index='end', text=str(file_["filename"]))
+            for item in file_.items():
+                self.treeview.insert(parent=ranNum, index='end', text=str(item))
+
+
+
+    # This will clear the tree so when you scan again, the items in the tree will disappear
+    def clear_tree(self):
+        children_count = 1
+        try:
+            while True:
+                for x in self.treeview.get_children(children_count):
+                    self.treeview.delete(x)
+                children_count += 1
+        except Exception:
+            pass
 
     # checkbox so that you can filter all files by flagged
     def checkboxActions(self):
@@ -306,22 +318,38 @@ class Application(tk.Frame):
         for file_ in files:
             if file_["flag"] == True:
                 self.text.insert(tk.END, str(file_["data"])+"\n")
-                
-
-        
 
     # This will add how many of a particular item was found and at it after the name such as "Text Files (4)" if it found 4 text files.
     def setTreeviewCounts(self):
         
+        
         num1 = len(self.treeview.get_children(1))
         num2 = len(self.treeview.get_children(2))
         num3 = len(self.treeview.get_children(3))
-        totalFilesFound = num1 + num2 + num3
-        self.treeview.item(1, text='Documents ( ' + str(num1) +' )')
-        self.treeview.item(2, text='Graphics ( ' + str(num2) +' )')
-        self.treeview.item(3, text='Unknown ( ' + str(num3) +' )')
-        self.lbl_5.config(text="Files Scanned: "+ str(totalFilesFound))
-        # self.treeview.insert("", index='end',iid=1,text="Test"+num)
+        if num1 + num2 + num3 != 0:
+            self.treeview.item(1, text='Documents ( ' + str("{:,}".format(num1)) +' )')
+            self.treeview.item(2, text='Graphics ( ' + str("{:,}".format(num2)) +' )')
+            self.treeview.item(3, text='Unknown ( ' + str("{:,}".format(num3)) +' )')
+        else:
+            pass
+    
+    def setfileCountLabels(self):
+
+        totalFiles = 0
+        flaggedFiles = 0
+        totalFilesByLen = len(self.files_Global)
+        for file_ in self.files_Global:
+            totalFiles+=1
+            if file_["flag"] == True:
+                flaggedFiles+=1
+        
+
+        self.lbl_5.config(text="Total Files: "+ str("{:,}".format(totalFilesByLen)))
+        self.lbl_6.config(text="Flagged Files: "+ str("{:,}".format(flaggedFiles)))
+        
+       
+
+    
 
     # Browse button function call           
     def browseButtonActions(self):
@@ -331,20 +359,7 @@ class Application(tk.Frame):
             self.entry.delete('0',END)
             self.entry.insert('0',folder_selected)
 
-    # Inserting data into treeview
-    def insert_data(self,file, parentNumber):         
-        self.treeview.insert(parent=parentNumber, index='end', text=str(file))
-    
-    # This will clear the tree so when you scan again, the items in the tree will disappear
-    def clear_tree(self):
-        children_count = 1
-        try:
-            while True:
-                for x in self.treeview.get_children(children_count):
-                    self.treeview.delete(x)
-                children_count += 1
-        except Exception as e:
-            pass
+
             
     # Pop up message
     def popupmsg(self,msg):

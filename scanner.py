@@ -1,5 +1,7 @@
 from pathlib import Path
 import re
+import pickle
+
 class Scanner:
 
     # word list. I might make this editable so someone can edit/add ones they want
@@ -29,10 +31,7 @@ class Scanner:
             else:
                 if i.is_file():
                         fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
-                        self.files.append(fileDict)
-        
-        #return self.files
-    
+                        self.files.append(fileDict)    
 
 
     # checking to see if a keyword is in a filename
@@ -92,7 +91,7 @@ class Scanner:
     # Ignore_dir.txt which will hold directories you want to ignore
     def getIgnoredDirectories(self):
         ignored_directories = []
-        f = open("ignore_dir.txt","r")
+        f = open("ignored directories.txt","r")
         for x in f:
             ignored_directories.append(x)
         f.close()
