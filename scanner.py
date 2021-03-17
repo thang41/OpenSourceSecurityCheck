@@ -12,7 +12,7 @@ class Scanner:
             'username','login',
             'confidential','secret','personal',
             'secure','registration','doctor','taxes',
-            'financial','receipt','taxes','resume',
+            'financial','receipt','taxes',
             'doctor','medical','money','contact','sensitive']
     
     # this will store all of the file dictionsaries
@@ -62,10 +62,46 @@ class Scanner:
                     
                     # searching contents of file for SSN
                     file_ = self.ssnSearch(file_, fileContents)
+
+                    # searching for phone numbers
+                    file_ = self.phoneNumberSearch(file_, fileContents)
+
+                    file_ = self.emailSearch(file_, fileContents)
                     
 
                 except UnicodeDecodeError:
-                    pass            
+                    pass
+
+    def emailSearch(self, file_, fileContents):
+        emailFound = re.findall(r'[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+', fileContents)
+
+        strEmailFound = ""
+
+        for email in emailFound:
+            strEmailFound = strEmailFound + " , " + email
+        
+        if len(emailFound) < 1:
+            return file_
+        
+        else:
+            file_["flag"] = True
+            file_["data"]["email"] = file_["data"]["email"] + strEmailFound
+
+    def phoneNumberSearch(self, file_, fileContents):  
+        phoneFound = re.findall(r'(?<!\d)(?!000|.+0{4})(?:\d{10}|\d{3}-\d{3}-\d{4}|\d{3}\.\d{3}\.\d{4}|\d{3}\s\d{3}\s\d{4}|\(\d{3}\)\s\d{3}\s\d{4})(?!\d)', fileContents)
+
+        strPhoneFound = ""
+        
+        for phone in phoneFound:
+            strPhoneFound = strPhoneFound + " , " + phone
+        
+        if len(phoneFound) < 1:
+            return file_
+        else:
+            file_["flag"] = True
+            file_["data"]["phone"] = file_["data"]["phone"] + strPhoneFound
+
+            return file_
 
     # searching for SSNs
     def ssnSearch(self,file_,fileContents):
@@ -76,7 +112,7 @@ class Scanner:
         strSSNFOUND = ""
 
         for ssn in ssnFound:
-            strSSNFOUND = strSSNFOUND + " " + ssn
+            strSSNFOUND = strSSNFOUND + " , " + ssn
         
         if len(ssnFound) < 1:
             return file_

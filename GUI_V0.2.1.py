@@ -81,15 +81,15 @@ class Application(tk.Frame):
 
         # export Button
         self.exportButton = ttk.Button(self.root, text='Export',state=tk.DISABLED)
-        self.exportButton.place(x=100,y=220)
+        self.exportButton.place(x=190,y=220)
 
         # Exit Button
         self.exitButton = ttk.Button(self.root, text='Exit', command=self.root.destroy)
         self.exitButton.place(x=335,y=220)
 
-        # TEMP BUTTON
-        self.tempButton = ttk.Button(self.root, text='Options', state=tk.DISABLED)
-        self.tempButton.place(x=190,y=220)
+        # Options BUTTON
+        self.optionsButton = ttk.Button(self.root, text='Options', state=tk.DISABLED)
+        self.optionsButton.place(x=100,y=220)
 
         # Notebook
         self.notebook = ttk.Notebook(self.root)
@@ -100,10 +100,10 @@ class Application(tk.Frame):
         # self.notebook.add(self.notebookTab1, text='  Data  ')
 
         self.notebookTab2 = ttk.Frame(self.notebook)
-        self.notebook.add(self.notebookTab2, text='  File  ')
+        self.notebook.add(self.notebookTab2, text='    Files    ')
 
         self.notebookTab3 = ttk.Frame(self.notebook)
-        self.notebook.add(self.notebookTab3, text='  Other  ')
+        self.notebook.add(self.notebookTab3, text='  Report  ')
 
         # Treeview
         self.treeview = ttk.Treeview(self.notebookTab2,height=38)
@@ -151,7 +151,7 @@ class Application(tk.Frame):
 
         # Checkbox for flagged files
         self.flaggedCheckBox = ttk.Checkbutton(self.root, text="Flagged Files", variable=self.var1, onvalue=1, offvalue=0, command=lambda: self.checkboxActions())
-        self.flaggedCheckBox.place(x=550,y=20)
+        self.flaggedCheckBox.place(x=560,y=20)
 
     # Right Click menu
     def onRight(self, *args):
@@ -251,6 +251,7 @@ class Application(tk.Frame):
             self.setfileCountLabels()
       
         self.setTreeviewCounts()
+        self.setExportEnableOrDisable()
 
     # this is the main code for writing data to the treeview
     def writingToTree(self):
@@ -385,6 +386,9 @@ class Application(tk.Frame):
 
     def optionsButtonActions(self):
         pass
+    
+    def setExportEnableOrDisable(self):
+        self.exportButton.config(state=tk.NORMAL)
     
 
         
