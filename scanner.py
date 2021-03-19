@@ -34,22 +34,35 @@ class Scanner:
 
             # If there are directories in the "ignored directories.p" file, then it will iterate through them to see if file should be ignored
             if len(ignored_directories) > 0:
-                for directory in ignored_directories:
-                    if directory in os.path.normpath(i.parents[0]):
-                        pass
-                    if Path(i).suffix in ignored_filetypes:
-                        pass
+                print("here 1")
+                #for directory in ignored_directories:
+                    #if directory in os.path.normpath(i.parents[0]):
+                
+
+                
+                
+
+                if os.path.normpath(i.parents[0]) in ignored_directories:
+                    continue
+                if Path(i).suffix in ignored_filetypes:
+                    continue
+                else: 
                     if i.is_file():
-                            fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
-                            self.files.append(fileDict)  
+                        print("here 2")
+                        fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
+                        self.files.append(fileDict)
+                    else:
+                        continue
+                            
 
             # if there are none in ignored directories.p it will run this  
             elif Path(i).suffix in ignored_filetypes:
-                pass
+                continue
             else:
                 if i.is_file():
-                                fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
-                                self.files.append(fileDict)  
+                    print("here 3")
+                    fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
+                    self.files.append(fileDict)  
 
 
     # checking to see if a keyword is in a filename

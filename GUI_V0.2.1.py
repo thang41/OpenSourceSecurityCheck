@@ -187,7 +187,7 @@ class Application(tk.Frame):
             selection = self.treeview.focus()
             tempDict = self.treeview.item(selection)
             scan1 = scanner.Scanner()
-            scan1.ignoreThisDirectory(tempDict['pathParent'])
+            #scan1.ignoreThisDirectory(tempDict['pathParent'])
             
             try:
                 self.onRight_menu.destroy()
@@ -487,12 +487,12 @@ class Application(tk.Frame):
             directory_contents = textBox2.get(1.0, END)
             contents = directory_contents.split('\n')
             contents = list(filter(len, contents))
-            try:
-                for dir in contents:                
-                    index = contents.index(dir)
-                    contents[index] = os.path.normpath(dir)
-            except:
-                pass
+            # try:
+            #     for dir in contents:                
+            #         index = contents.index(dir)
+            #         contents[index] = os.path.normpath(dir)
+            # except:
+            #     pass
 
             pickle.dump(contents, open("ignored directories.p", "wb"))
 
