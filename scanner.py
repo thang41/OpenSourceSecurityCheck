@@ -1,19 +1,23 @@
 from pathlib import Path
-import re
+import re, pickle, os
 import pickle
 
 class Scanner:
 
     # word list. I might make this editable so someone can edit/add ones they want
-    wordList = ['important','password','private','bank',
-            'hidden','phone','credit card','paypal',
-            'email','backup','nude','hidden','porn',
-            'finance','purchase','mastercard','passport','identification',
-            'username','login',
-            'confidential','secret','personal',
-            'secure','registration','doctor','taxes',
-            'financial','receipt','taxes',
-            'doctor','medical','money','contact','sensitive']
+    # wordList = ['important','password','private','bank',
+    #         'hidden','phone','credit card','paypal',
+    #         'email','backup','nude','hidden','porn',
+    #         'finance','purchase','mastercard','passport','identification',
+    #         'username','login',
+    #         'confidential','secret','personal',
+    #         'secure','registration','doctor','taxes',
+    #         'financial','receipt','taxes',
+    #         'doctor','medical','money','contact','sensitive']
+    
+    wordList = ""
+    ignored_type = ""
+    ignored_dir = ""
     
     # this will store all of the file dictionsaries
     files = []
@@ -26,12 +30,22 @@ class Scanner:
         ignored_directories = self.getIgnoredDirectories()
         
         for i in Path(self.p).rglob("*"):
-            if str(i.parents[0]) in ignored_directories: # allow you to ignore certain directories
-                pass
+
+            # If there are directories in the "ignored directories.p" file, then it will iterate through them to see if file should be ignored
+            if len(ignored_directories) > 0:
+                for directory in ignored_directories:
+                    if directory in os.path.normpath(i.parents[0]):
+                        pass
+                    else:
+                        if i.is_file():
+                                fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
+                                self.files.append(fileDict)  
+
+            # if there are none in ignored directories.p it will run this  
             else:
                 if i.is_file():
-                        fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
-                        self.files.append(fileDict)    
+                                fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
+                                self.files.append(fileDict)  
 
 
     # checking to see if a keyword is in a filename
@@ -47,8 +61,6 @@ class Scanner:
     def readInTextFile(self):
         for file_ in self.files:
             if file_["filetype"] == ".txt":
-                
-            
                 try: # trying to open the file, sometimes it won't read because it isn't always ascii characters. 
                     f = open(file_["fullPath"], "r")
                     fileContents = f.read()
@@ -126,31 +138,31 @@ class Scanner:
     
     # Ignore_dir.txt which will hold directories you want to ignore
     def getIgnoredDirectories(self):
-        ignored_directories = []
-        f = open("ignored directories.txt","r")
-        for x in f:
-            ignored_directories.append(x)
-        f.close()
-
+       
+        ignored_directories = pickle.load(open("ignored directories.p","rb"))
+        
         return ignored_directories
     
     def ignoreThisDirectory(self,i):
-        f = open("ignore_dir.txt","w")
+        f = pickle.dump(i, open("ignored directories.p", "wb"))
 
-        j = Path(i)
-        
-        
-        f.write(str(j.parents[0]))
-        f.close()
+      
     
     # Setting path to scan
     def setPath(self,i):
         self.p = i
+    
+    def getWordList(self):
+        self.wordList = pickle.load(open("word list.p", "rb"))
 
     def get_scanning(self):
+        self.getWordList()
         self.files = [] # removing all data in the files list
         self.directory_file_iteration()
         self.checkFileNames()
         self.readInTextFile()
         
         return self.files
+    
+  
+

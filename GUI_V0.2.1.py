@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import ttk, filedialog, END
-import time, string, timer, scanner
+from tkinter import ttk, filedialog, END, BOTH
+import time, string, timer, scanner, os, pickle
 from random import seed
 from random import random
+
 
 class Application(tk.Frame):
     #directory = tk.StringVar()
@@ -10,6 +11,7 @@ class Application(tk.Frame):
     folder_selected = ''
     full_scan = False # for the popup message, but I commeneted out so no use atm
     files_Global = []
+    keyWords_Global = []
 
     def __init__(self, root):
         self.root = root
@@ -81,15 +83,15 @@ class Application(tk.Frame):
 
         # export Button
         self.exportButton = ttk.Button(self.root, text='Export',state=tk.DISABLED)
-        self.exportButton.place(x=190,y=220)
+        self.exportButton.place(x=170,y=220)
 
         # Exit Button
         self.exitButton = ttk.Button(self.root, text='Exit', command=self.root.destroy)
         self.exitButton.place(x=335,y=220)
 
         # Options BUTTON
-        self.optionsButton = ttk.Button(self.root, text='Options', state=tk.DISABLED)
-        self.optionsButton.place(x=100,y=220)
+        self.optionsButton = ttk.Button(self.root, text='Options', command=lambda: self.optionsMenu())
+        self.optionsButton.place(x=90,y=220)
 
         # Notebook
         self.notebook = ttk.Notebook(self.root)
@@ -105,7 +107,7 @@ class Application(tk.Frame):
         self.notebookTab3 = ttk.Frame(self.notebook)
         self.notebook.add(self.notebookTab3, text='  Report  ')
 
-        # Treeview
+        # Tree
         self.treeview = ttk.Treeview(self.notebookTab2,height=38)
         self.treeview.pack()
 
@@ -182,7 +184,7 @@ class Application(tk.Frame):
             selection = self.treeview.focus()
             tempDict = self.treeview.item(selection)
             scan1 = scanner.Scanner()
-            scan1.ignoreThisDirectory(tempDict['text'])
+            scan1.ignoreThisDirectory(tempDict['pathParent'])
             
             try:
                 self.onRight_menu.destroy()
@@ -289,13 +291,13 @@ class Application(tk.Frame):
     # Inserting data into treeview
     def insert_data(self,file_, parentNumber):
         
-        if file_["flag"] == False:
-            self.treeview.insert(parent=parentNumber, index='end', text=str(file_["filename"]))
-        else:
-            ranNum = random()
-            self.treeview.insert(parent=parentNumber, iid=ranNum, index='end', text=str(file_["filename"]))
-            for item in file_.items():
-                self.treeview.insert(parent=ranNum, index='end', text=str(item))
+        # if file_["flag"] == False:
+        #     self.treeview.insert(parent=parentNumber, index='end', text=str(file_["filename"]))
+        # else:
+        ranNum = random()
+        self.treeview.insert(parent=parentNumber, iid=ranNum, index='end', text=str(file_["filename"]))
+        for item in file_.items():
+            self.treeview.insert(parent=ranNum, index='end', text=str(item))
 
 
 
@@ -315,10 +317,10 @@ class Application(tk.Frame):
         self.writingToTree()
 
     # Write data to the text box widget
-    def writeToTextBox(self, files):
-        for file_ in files:
-            if file_["flag"] == True:
-                self.text.insert(tk.END, str(file_["data"])+"\n")
+    # def writeToTextBox(self, files):
+    #     for file_ in files:
+    #         if file_["flag"] == True:
+    #             self.text.insert(tk.END, str(file_["data"])+"\n")
 
     # This will add how many of a particular item was found and at it after the name such as "Text Files (4)" if it found 4 text files.
     def setTreeviewCounts(self):
@@ -360,9 +362,123 @@ class Application(tk.Frame):
             self.entry.delete('0',END)
             self.entry.insert('0',folder_selected)
 
+    # Options Menu popup
+    def optionsMenu(self):
+        popup = tk.Tk()
+        popup.title("Info")
+        popupWidth = 800
+        popupHeight = 600
+        screenWidth = self.root.winfo_screenwidth()
+        screenHeight = self.root.winfo_screenheight()
+        xCordinate = int((screenWidth/2) - (popupWidth/2))
+        yCordinate = int((screenHeight/2) - (popupHeight/2))
+        popup.geometry("{}x{}+{}+{}".format(popupWidth, popupHeight, xCordinate, yCordinate))
+
+        flag = False
+
+        # Creating notebook widget
+        notebook = ttk.Notebook(popup)
+        notebook.pack(fill='x')
+
+        #Notebook tabs
+        notebookTab1 = ttk.Frame(notebook)
+        notebook.add(notebookTab1, text='  Keywords  ')
+
+        notebookTab2 = ttk.Frame(notebook)
+        notebook.add(notebookTab2, text='    Ignored Directories    ')
+
+        notebookTab3 = ttk.Frame(notebook)
+        notebook.add(notebookTab3, text='  Ignored Filetypes  ')
+
+        textBox = tk.Text(notebookTab1, height=600, width=800, borderwidth=2)
+        textBox.pack(pady=(0,50))
+
+        textBox2 = tk.Text(notebookTab2, height=600, width=800, borderwidth=2)
+        textBox2.pack(pady=(0,50))
+
+        textBox3 = tk.Text(notebookTab3, height=600, width=800, borderwidth=2)
+        textBox3.pack(pady=(0,50))
+        
+        B1 = ttk.Button(popup, text="    Apply    ",state=tk.DISABLED, command=lambda: [writeToWordListFile(), writeToIgnoredDirFile(), popup.destroy()])
+        B1.place(x=710,y=560)
+
+        B2 = ttk.Button(popup, text="    Cancel    ", command=lambda: popup.destroy())
+        B2.place(x=630,y=560) 
+
+        try:
+            wordList = pickle.load(open("word list.p", "rb"))
+        except EOFError:
+            wordList = []
+    
+        try:
+            ignoredDir = pickle.load(open("ignored directories.p", "rb"))
+        except EOFError:
+            ignoredDir = []
+
+        if len(wordList) > 0:
+            for word in wordList:
+                textBox.insert(END, word + "\n")
+
+        if len(ignoredDir) > 0:
+            for directory in ignoredDir:
+                textBox2.insert(END, directory + "\n")
+        
+        
+        textBox.edit_modified(False)
+        textBox2.edit_modified(False)
+
+        def writeToTextBox(self):
+            pass
+
+        def on_click(event):         
+            if textBox.edit_modified():
+                B1.config(state=tk.NORMAL)
+
+            elif textBox2.edit_modified():
+                B1.config(state=tk.NORMAL)
+
+        textBox.bind("<<Modified>>", on_click)
+        textBox2.bind("<<Modified>>", on_click)
+
+
+        def writeToWordListFile():
+            try:
+                keyword_contents = textBox.get(1.0, END)
+                contents = keyword_contents.split('\n')
+                contents = list(filter(len, contents))
+                pickle.dump(contents, open("word list.p", "wb"))
+            except:
+                pass
+        
+        def writeToIgnoredDirFile():
+            directory_contents = textBox2.get(1.0, END)
+            contents = directory_contents.split('\n')
+
+            contents = list(filter(len, contents))
+
+            try:
+                for dir in contents:
+                    
+                    
+                    index = contents.index(dir)
+               
+                    contents[index] = os.path.normpath(dir)
+            except:
+                pass
+
+            pickle.dump(contents, open("ignored directories.p", "wb"))
+
+           
+
 
             
-    # Pop up message
+
+        
+        popup.mainloop()
+    
+
+            
+    # Pop up message for warning
     def popupmsg(self,msg):
         popup = tk.Tk()
         popup.title("Info")
@@ -381,8 +497,8 @@ class Application(tk.Frame):
         B2.place(x=120,y=50)
         popup.mainloop()
     
-    # def popupmsgButtonActions(self):
-    #     full_scan = True
+    def popupmsgButtonActions(self):
+        full_scan = True
 
     def optionsButtonActions(self):
         pass
