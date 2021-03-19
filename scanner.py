@@ -34,7 +34,7 @@ class Scanner:
 
             # If there are directories in the "ignored directories.p" file, then it will iterate through them to see if file should be ignored
             if len(ignored_directories) > 0:
-                print("here 1")
+               
                 #for directory in ignored_directories:
                     #if directory in os.path.normpath(i.parents[0]):
                 
@@ -48,7 +48,7 @@ class Scanner:
                     continue
                 else: 
                     if i.is_file():
-                        print("here 2")
+                        
                         fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
                         self.files.append(fileDict)
                     else:
@@ -60,7 +60,7 @@ class Scanner:
                 continue
             else:
                 if i.is_file():
-                    print("here 3")
+                    
                     fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
                     self.files.append(fileDict)  
 

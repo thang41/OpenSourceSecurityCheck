@@ -421,16 +421,19 @@ class Application(tk.Frame):
 
         try:
             wordList = pickle.load(open("word list.p", "rb"))
+            wordList = sorted(wordList)
         except EOFError:
             wordList = []
     
         try:
             ignoredDir = pickle.load(open("ignored directories.p", "rb"))
+            ignoredDir = sorted(ignoredDir)
         except EOFError:
             ignoredDir = []
         
         try:
             ignoredType = pickle.load(open("ignored filetypes.p", "rb"))
+            ignoredType = sorted(ignoredType)
         except EOFError:
             ignoredType = []
 
