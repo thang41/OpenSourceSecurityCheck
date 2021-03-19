@@ -28,6 +28,7 @@ class Scanner:
 
     def directory_file_iteration(self):
         ignored_directories = self.getIgnoredDirectories()
+        ignored_filetypes = self.getIgnoredFileTypes()
         
         for i in Path(self.p).rglob("*"):
 
@@ -36,12 +37,15 @@ class Scanner:
                 for directory in ignored_directories:
                     if directory in os.path.normpath(i.parents[0]):
                         pass
-                    else:
-                        if i.is_file():
-                                fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
-                                self.files.append(fileDict)  
+                    if Path(i).suffix in ignored_filetypes:
+                        pass
+                    if i.is_file():
+                            fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
+                            self.files.append(fileDict)  
 
             # if there are none in ignored directories.p it will run this  
+            elif Path(i).suffix in ignored_filetypes:
+                pass
             else:
                 if i.is_file():
                                 fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
@@ -138,15 +142,13 @@ class Scanner:
     
     # Ignore_dir.txt which will hold directories you want to ignore
     def getIgnoredDirectories(self):
-       
         ignored_directories = pickle.load(open("ignored directories.p","rb"))
-        
         return ignored_directories
     
-    def ignoreThisDirectory(self,i):
-        f = pickle.dump(i, open("ignored directories.p", "wb"))
-
-      
+    # Ignore the file types in this file such as .torrent, .txt
+    def getIgnoredFileTypes(self):
+        ignored_filetypes = pickle.load(open("ignored filetypes.p", "rb"))
+        return ignored_filetypes
     
     # Setting path to scan
     def setPath(self,i):

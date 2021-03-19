@@ -117,7 +117,10 @@ class Application(tk.Frame):
 
         self.treeview.insert(parent='', index='end', iid=1, text="Documents" )
         self.treeview.insert(parent='', index='end', iid=2, text="Graphics")
-        self.treeview.insert(parent='', index='end', iid=3, text="Unknown")
+        self.treeview.insert(parent='', index='end', iid=3, text="Multimedia")
+        self.treeview.insert(parent='', index='end', iid=4, text="Archives")
+        self.treeview.insert(parent='', index='end', iid=5, text="Executable")
+        self.treeview.insert(parent='', index='end', iid=6, text="Other Known Types")
         #self.treeview.item(1, open=True)
 
         self.iid = 3
@@ -276,16 +279,23 @@ class Application(tk.Frame):
 
     # this was necesarry to break up the code for the function above. Just made it look better
     def writingToTreeCall(self,file_):
-        if file_["filetype"] in (".doc", ".rtf", ".txt","docx"):
+        if file_["filetype"] in (".doc", ".rtf", ".txt",".docx", ".pdf"):
             self.insert_data(file_,1)
             return
-
         if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
             self.insert_data(file_, 2)
             return
-
+        if file_["filetype"] in {".mp4",".mpeg", ".mov", ".mkv",".flv",".avi", ".webm"}:
+            self.insert_data(file_, 3)
+            return
+        if file_["filetype"] in {".zip", ".7z", ".gz", ".zipx", ".zz", ".s7z", ".rar"}:
+            self.insert_data(file_, 4)
+            return
+        if file_["filetype"] in {".exe", ".bat", ".bin", ".cmd"}:
+            self.insert_data(file_, 5)
+            return
         else:
-            self.insert_data(file_,3)
+            self.insert_data(file_,6)
             return
 
     # Inserting data into treeview
@@ -329,15 +339,20 @@ class Application(tk.Frame):
         num1 = len(self.treeview.get_children(1))
         num2 = len(self.treeview.get_children(2))
         num3 = len(self.treeview.get_children(3))
-        if num1 + num2 + num3 != 0:
+        num4 = len(self.treeview.get_children(4))
+        num5 = len(self.treeview.get_children(5))
+        num6 = len(self.treeview.get_children(6))
+        if num1 + num2 + num3 + num4 + num5 + num6 != 0:
             self.treeview.item(1, text='Documents ( ' + str("{:,}".format(num1)) +' )')
             self.treeview.item(2, text='Graphics ( ' + str("{:,}".format(num2)) +' )')
-            self.treeview.item(3, text='Unknown ( ' + str("{:,}".format(num3)) +' )')
+            self.treeview.item(3, text='Multimedia ( ' + str("{:,}".format(num3)) +' )')
+            self.treeview.item(4, text='Archives ( ' + str("{:,}".format(num4)) +' )')
+            self.treeview.item(5, text='Executable ( ' + str("{:,}".format(num5)) +' )')
+            self.treeview.item(6, text='Other Known Types ( ' + str("{:,}".format(num6)) +' )')
         else:
             pass
     
     def setfileCountLabels(self):
-
         totalFiles = 0
         flaggedFiles = 0
         totalFilesByLen = len(self.files_Global)
@@ -345,7 +360,6 @@ class Application(tk.Frame):
             totalFiles+=1
             if file_["flag"] == True:
                 flaggedFiles+=1
-        
 
         self.lbl_5.config(text="Total Files: "+ str("{:,}".format(totalFilesByLen)))
         self.lbl_6.config(text="Flagged Files: "+ str("{:,}".format(flaggedFiles)))
@@ -399,7 +413,7 @@ class Application(tk.Frame):
         textBox3 = tk.Text(notebookTab3, height=600, width=800, borderwidth=2)
         textBox3.pack(pady=(0,50))
         
-        B1 = ttk.Button(popup, text="    Apply    ",state=tk.DISABLED, command=lambda: [writeToWordListFile(), writeToIgnoredDirFile(), popup.destroy()])
+        B1 = ttk.Button(popup, text="    Apply    ",state=tk.DISABLED, command=lambda: [writeToWordListFile(), writeToIgnoredDirFile(), writeToFileType(), setModifiedFalse(), popup.destroy()])
         B1.place(x=710,y=560)
 
         B2 = ttk.Button(popup, text="    Cancel    ", command=lambda: popup.destroy())
@@ -414,6 +428,11 @@ class Application(tk.Frame):
             ignoredDir = pickle.load(open("ignored directories.p", "rb"))
         except EOFError:
             ignoredDir = []
+        
+        try:
+            ignoredType = pickle.load(open("ignored filetypes.p", "rb"))
+        except EOFError:
+            ignoredType = []
 
         if len(wordList) > 0:
             for word in wordList:
@@ -423,9 +442,19 @@ class Application(tk.Frame):
             for directory in ignoredDir:
                 textBox2.insert(END, directory + "\n")
         
+        if len(ignoredType) > 0:
+            for directory in ignoredType:
+                textBox3.insert(END, directory + "\n")
+        
         
         textBox.edit_modified(False)
         textBox2.edit_modified(False)
+        textBox3.edit_modified(False)
+
+        def setModifiedFalse():
+            textBox.edit_modified(False)
+            textBox2.edit_modified(False)
+            textBox3.edit_modified(False)
 
         def writeToTextBox(self):
             pass
@@ -436,9 +465,13 @@ class Application(tk.Frame):
 
             elif textBox2.edit_modified():
                 B1.config(state=tk.NORMAL)
+            
+            elif textBox3.edit_modified():
+                B1.config(state=tk.NORMAL)
 
         textBox.bind("<<Modified>>", on_click)
         textBox2.bind("<<Modified>>", on_click)
+        textBox3.bind("<<Modified>>", on_click)
 
 
         def writeToWordListFile():
@@ -453,23 +486,26 @@ class Application(tk.Frame):
         def writeToIgnoredDirFile():
             directory_contents = textBox2.get(1.0, END)
             contents = directory_contents.split('\n')
-
             contents = list(filter(len, contents))
-
             try:
-                for dir in contents:
-                    
-                    
+                for dir in contents:                
                     index = contents.index(dir)
-               
                     contents[index] = os.path.normpath(dir)
             except:
                 pass
 
             pickle.dump(contents, open("ignored directories.p", "wb"))
 
+        
+        def writeToFileType():
+            try:
+                ignored_filetypes = textBox3.get(1.0, END)
+                contents = ignored_filetypes.split('\n')
+                contents = list(filter(len, contents))
+            except:
+                pass
            
-
+            pickle.dump(contents, open("ignored filetypes.p", "wb"))
 
             
 
