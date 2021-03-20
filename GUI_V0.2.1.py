@@ -82,8 +82,8 @@ class Application(tk.Frame):
         self.scanButton.place(x=10,y=220)
 
         # export Button
-        self.exportButton = ttk.Button(self.root, text='Export',state=tk.DISABLED)
-        self.exportButton.place(x=170,y=220)
+        # self.exportButton = ttk.Button(self.root, text='Export',state=tk.DISABLED)
+        # self.exportButton.place(x=170,y=220)
 
         # Exit Button
         self.exitButton = ttk.Button(self.root, text='Exit', command=self.root.destroy)
@@ -124,9 +124,10 @@ class Application(tk.Frame):
         self.treeview.insert(parent='', index='end', iid=1, text="Documents" )
         self.treeview.insert(parent='', index='end', iid=2, text="Graphics")
         self.treeview.insert(parent='', index='end', iid=3, text="Multimedia")
-        self.treeview.insert(parent='', index='end', iid=4, text="Archives")
+        self.treeview.insert(parent='', index='end', iid=4, text="Archive")
         self.treeview.insert(parent='', index='end', iid=5, text="Executable")
-        self.treeview.insert(parent='', index='end', iid=6, text="Other Known Types")
+        self.treeview.insert(parent='', index='end', iid=6, text="Other")
+        self.treeview.insert(parent='', index='end', iid=7, text="Unknown")
         #self.treeview.item(1, open=True)
 
         self.iid = 3
@@ -264,7 +265,7 @@ class Application(tk.Frame):
             self.setfileCountLabels()
       
         self.setTreeviewCounts()
-        self.setExportEnableOrDisable()
+        #self.setExportEnableOrDisable()
 
     # this is the main code for writing data to the treeview
     def writingToTree(self):
@@ -303,8 +304,13 @@ class Application(tk.Frame):
             self.insert_data(file_, 5)
             return
         else:
-            self.insert_data(file_,6)
-            return
+            if file_["filetype"] != '': 
+                
+                self.insert_data(file_,6)
+                return
+            else:
+                self.insert_data(file_,7)
+                return
 
     # Inserting data into treeview
     def insert_data(self,file_, parentNumber):
@@ -350,16 +356,18 @@ class Application(tk.Frame):
         num4 = len(self.treeview.get_children(4))
         num5 = len(self.treeview.get_children(5))
         num6 = len(self.treeview.get_children(6))
+        num7 = len(self.treeview.get_children(7))
         if num1 + num2 + num3 + num4 + num5 + num6 != 0:
             self.treeview.item(1, text='Documents ( ' + str("{:,}".format(num1)) +' )')
             self.treeview.item(2, text='Graphics ( ' + str("{:,}".format(num2)) +' )')
             self.treeview.item(3, text='Multimedia ( ' + str("{:,}".format(num3)) +' )')
-            self.treeview.item(4, text='Archives ( ' + str("{:,}".format(num4)) +' )')
+            self.treeview.item(4, text='Archive ( ' + str("{:,}".format(num4)) +' )')
             self.treeview.item(5, text='Executable ( ' + str("{:,}".format(num5)) +' )')
-            self.treeview.item(6, text='Other Known Types ( ' + str("{:,}".format(num6)) +' )')
+            self.treeview.item(6, text='Other ( ' + str("{:,}".format(num6)) +' )')
+            self.treeview.item(7, text='Unknown ( ' + str("{:,}".format(num7)) +' )')
         else:
             pass
-    
+    # Sets how many files have been found and how many were flagged
     def setfileCountLabels(self):
         totalFiles = 0
         flaggedFiles = 0
@@ -371,10 +379,6 @@ class Application(tk.Frame):
 
         self.lbl_5.config(text="Total Files: "+ str("{:,}".format(totalFilesByLen)))
         self.lbl_6.config(text="Flagged Files: "+ str("{:,}".format(flaggedFiles)))
-        
-       
-
-    
 
     # Browse button function call           
     def browseButtonActions(self):
@@ -518,13 +522,8 @@ class Application(tk.Frame):
            
             pickle.dump(contents, open("ignored filetypes.p", "wb"))
 
-            
-
-        
         popup.mainloop()
-    
 
-            
     # Pop up message for warning
     def popupmsg(self,msg):
         popup = tk.Tk()

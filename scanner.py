@@ -3,18 +3,7 @@ import re, pickle, os
 import pickle
 
 class Scanner:
-
-    # word list. I might make this editable so someone can edit/add ones they want
-    # wordList = ['important','password','private','bank',
-    #         'hidden','phone','credit card','paypal',
-    #         'email','backup','nude','hidden','porn',
-    #         'finance','purchase','mastercard','passport','identification',
-    #         'username','login',
-    #         'confidential','secret','personal',
-    #         'secure','registration','doctor','taxes',
-    #         'financial','receipt','taxes',
-    #         'doctor','medical','money','contact','sensitive']
-    
+   
     wordList = ""
     ignored_type = ""
     ignored_dir = ""
@@ -22,10 +11,10 @@ class Scanner:
     # this will store all of the file dictionsaries
     files = []
 
-
+    # This is the path that will be scanned
     p = ''
 
-
+    # The code that iterates through the path from above
     def directory_file_iteration(self):
         ignored_directories = self.getIgnoredDirectories()
         ignored_filetypes = self.getIgnoredFileTypes()
@@ -33,24 +22,22 @@ class Scanner:
         for i in Path(self.p).rglob("*"):
 
             # If there are directories in the "ignored directories.p" file, then it will iterate through them to see if file should be ignored
-            if len(ignored_directories) > 0:
-               
-                #for directory in ignored_directories:
-                    #if directory in os.path.normpath(i.parents[0]):
-                
-
-                
-                
-
+            if len(ignored_directories) > 0:            
+        
+                # If the path of the file is in the ignored directories file, it will move to the next file
                 if os.path.normpath(i.parents[0]) in ignored_directories:
                     continue
-                if Path(i).suffix in ignored_filetypes:
+                # if the file type of the file is in the ignored filetypes, it will move to the next file
+                if Path(i).suffix in ignored_filetypes or len(Path(i).suffix) == 0 and "none" in ignored_filetypes:
                     continue
+
+                # if it passes both, it will check if it's actually a file
                 else: 
                     if i.is_file():
-                        
+                        # creating a file dictionary of attributes
                         fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
                         self.files.append(fileDict)
+
                     else:
                         continue
                             
@@ -150,9 +137,7 @@ class Scanner:
             file_["data"]["ssn"] = file_["data"]["ssn"] + strSSNFOUND
 
             return file_
-        
-                
-    
+
     # Ignore_dir.txt which will hold directories you want to ignore
     def getIgnoredDirectories(self):
         ignored_directories = pickle.load(open("ignored directories.p","rb"))
