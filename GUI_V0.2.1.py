@@ -20,7 +20,7 @@ class Application(tk.Frame):
     def initialize_user_interface(self):
         #Configuring root object of the application
         self.root.title("Open-Source Security Check")
-        self.windowWidth = 1460
+        self.windowWidth = 1465
         self.windowHeight = 840
         self.screenWidth = self.root.winfo_screenwidth()
         self.screenHeight = self.root.winfo_screenheight()
@@ -107,13 +107,19 @@ class Application(tk.Frame):
         self.notebookTab3 = ttk.Frame(self.notebook)
         self.notebook.add(self.notebookTab3, text='  Report  ')
 
+        # Scrollbar
+        self.treeScroll = ttk.Scrollbar(self.notebookTab2)
+        self.treeScroll.pack(side='right', fill='y')
+
         # Tree
-        self.treeview = ttk.Treeview(self.notebookTab2,height=38)
-        self.treeview.pack()
+        self.treeview = ttk.Treeview(self.notebookTab2,height=38, yscrollcommand=self.treeScroll.set)
+        self.treeview.pack(side='left',fill='y')
 
         self.treeview.column("#0",width=1000)
         
         self.treeview.heading("#0", text="File Categories", anchor='w')
+
+        self.treeScroll.config(command=self.treeview.yview)
 
         self.treeview.insert(parent='', index='end', iid=1, text="Documents" )
         self.treeview.insert(parent='', index='end', iid=2, text="Graphics")
@@ -124,6 +130,8 @@ class Application(tk.Frame):
         #self.treeview.item(1, open=True)
 
         self.iid = 3
+
+
 
         # Text Output Box
         # self.text = tk.Text(self.notebookTab1, width=1000, height=780)
@@ -279,19 +287,19 @@ class Application(tk.Frame):
 
     # this was necesarry to break up the code for the function above. Just made it look better
     def writingToTreeCall(self,file_):
-        if file_["filetype"] in (".doc", ".rtf", ".txt",".docx", ".pdf"):
+        if file_["filetype"].lower() in (".doc", ".rtf", ".txt",".docx", ".pdf"):
             self.insert_data(file_,1)
             return
-        if file_["filetype"] in {".jpg",".png",".jpeg",".gif"}:
+        if file_["filetype"].lower() in {".jpg",".png",".jpeg",".gif"}:
             self.insert_data(file_, 2)
             return
-        if file_["filetype"] in {".mp4",".mpeg", ".mov", ".mkv",".flv",".avi", ".webm"}:
+        if file_["filetype"].lower() in {".mp4",".mpeg", ".mov", ".mkv",".flv",".avi", ".webm", ".mp3", ".flav",".flak",".wmv"}:
             self.insert_data(file_, 3)
             return
-        if file_["filetype"] in {".zip", ".7z", ".gz", ".zipx", ".zz", ".s7z", ".rar"}:
+        if file_["filetype"].lower() in {".zip", ".7z", ".gz", ".zipx", ".zz", ".s7z", ".rar"}:
             self.insert_data(file_, 4)
             return
-        if file_["filetype"] in {".exe", ".bat", ".bin", ".cmd"}:
+        if file_["filetype"].lower() in {".exe", ".bat", ".bin", ".cmd"}:
             self.insert_data(file_, 5)
             return
         else:
@@ -421,19 +429,19 @@ class Application(tk.Frame):
 
         try:
             wordList = pickle.load(open("word list.p", "rb"))
-            wordList = sorted(wordList)
+            #wordList = sorted(wordList)
         except EOFError:
             wordList = []
     
         try:
             ignoredDir = pickle.load(open("ignored directories.p", "rb"))
-            ignoredDir = sorted(ignoredDir)
+            #ignoredDir = sorted(ignoredDir)
         except EOFError:
             ignoredDir = []
         
         try:
             ignoredType = pickle.load(open("ignored filetypes.p", "rb"))
-            ignoredType = sorted(ignoredType)
+            #ignoredType = sorted(ignoredType)
         except EOFError:
             ignoredType = []
 
