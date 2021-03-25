@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, END, BOTH
 import time, string, timer, scanner, os, pickle
-from random import seed
-from random import random
+from random import seed, random, choice
+
 
 
 class Application(tk.Frame):
@@ -63,14 +63,14 @@ class Application(tk.Frame):
         # Radiobuttons
         self.radio0 = ttk.Radiobutton(self.radioframe, text='Quick Scan', variable=self.d, value=1)
         self.radio0.place(x=20, y=20)
-        self.radio1 = ttk.Radiobutton(self.radioframe, text='Full Scan', variable=self.d, value=2)
+        self.radio1 = ttk.Radiobutton(self.radioframe, text='Deep Scan', variable=self.d, value=2)
         self.radio1.place(x=20, y=60)
-        self.radio2 = ttk.Radiobutton(self.radioframe, text='Partial Scan', variable=self.d, value=3)
-        self.radio2.place(x=20, y=100)
+        # self.radio2 = ttk.Radiobutton(self.radioframe, text='Partial Scan', variable=self.d, value=3)
+        # self.radio2.place(x=20, y=100)
 
         # Entry
         self.entry = ttk.Entry(self.root, width=43)
-        self.entry.place(x=132, y=165)
+        self.entry.place(x=132, y=166)
         self.entry.insert(0,"")
 
         # Browse Button
@@ -132,33 +132,34 @@ class Application(tk.Frame):
 
         self.iid = 3
 
-
-
         # Text Output Box
-        # self.text = tk.Text(self.notebookTab1, width=1000, height=780)
-        # self.text.place(x=0,y=0)
+        self.textReportBox = tk.Text(self.notebookTab3, width=1000, height=780)
+        self.textReportBox.place(x=0,y=0)
+
+        self.treeScroll = ttk.Scrollbar(self.notebookTab3)
+        self.treeScroll.pack(side='right', fill='y')
 
         #Information Frame
         self.infoframe = ttk.LabelFrame(self.root, text='Information', width=410, height=570)
         self.infoframe.place(x=10,y=260)
 
-        self.lbl_1 = ttk.Label(self.infoframe, text=" • Quick scan will scan most used directories  ")
+        self.lbl_1 = ttk.Label(self.infoframe, text=" • Quick scan will scan just filenames for keywords.  ")
         self.lbl_1.place(x=7,y=10)
 
-        self.lbl_2 = ttk.Label(self.infoframe, text=" • Full scan scans all drives and folders. - (Time Consuming)  ")
+        self.lbl_2 = ttk.Label(self.infoframe, text=" • Deep scan checks filenames and filedata for keywords and sensitive info.\n     • Time Consuming\n     • Checks file data for phone numbers, cc info, ssn, and emails")
         self.lbl_2.place(x=7,y=35)
 
-        self.lbl_3 = ttk.Label(self.infoframe, text=" • Partial scan allows you to define the directory.")
-        self.lbl_3.place(x=7, y=60)
+        #self.lbl_3 = ttk.Label(self.infoframe, text=" • Partial scan allows you to define the directory.")
+        #self.lbl_3.place(x=7, y=60)
 
         self.lbl_4 = ttk.Label(self.infoframe, text="Scan time: ")
-        self.lbl_4.place(x=7, y=100)
+        self.lbl_4.place(x=7, y=110)
 
         self.lbl_5 = ttk.Label(self.infoframe, text="Total Files: ")
-        self.lbl_5.place(x=7, y=125)
+        self.lbl_5.place(x=7, y=135)
 
         self.lbl_6 = ttk.Label(self.infoframe, text="Flagged files: ")
-        self.lbl_6.place(x=7, y=150)
+        self.lbl_6.place(x=7, y=160)
         # Bind our functions to the Treeview.
         self.treeview.bind("<Button-3>", self.preClick)
         self.treeview.bind("<Button-1>", self.onLeft)
@@ -235,18 +236,52 @@ class Application(tk.Frame):
     # Scan button function call
     def scanButtonActions(self):
         self.clear_tree()
+        scan = scanner.Scanner() 
+
         if self.checkRadiobutton() == 1:
-            pass
-        
+
+            scan.setPath(self.entry.get())
+            timer1 = timer.Timer()
+            timer1.startTimer()
+            files = scan.get_scanning("quick")
+            self.files_Global = files
+
+            timer1.stopTimer()
+
+            self.lbl_4.config(text="Scan time: " + str(timer1.getTime()) + ' Seconds\n\n')
+
+            # Inserting into tree
+            self.writingToTree()
+            
+            # setting the total files scanned and flagged files labels in info box
+            self.setfileCountLabels()
+
         if self.checkRadiobutton() == 2:
-            self.popupmsg("    This could take a very long time, continue?")
-            if full_scan:
-                full_scan = False
-            pass
+            
+            #self.popupmsg("    This could take a very long time, continue?")
+            #self.text.delete('1.0',END) # Remove what's currently in entry widget
+            # creating scan object
+            timer1 = timer.Timer()
+            timer1.startTimer()
+
+            scan.setPath(self.entry.get())
+            files = scan.get_scanning("deep")
+            self.files_Global = files
+
+            timer1.stopTimer()
+
+            self.lbl_4.config(text="Scan time: " + str(timer1.getTime()) + ' Seconds\n\n')
+
+            # Inserting into tree
+            self.writingToTree()
+            
+            # setting the total files scanned and flagged files labels in info box
+            self.setfileCountLabels()
                 
         if self.checkRadiobutton() == 3:
+            files = scan.get_scanning("quick")
             #self.text.delete('1.0',END) # Remove what's currently in entry widget
-            scan = scanner.Scanner() # creating scan object
+            # creating scan object
             timer1 = timer.Timer()
             timer1.startTimer()
 
@@ -266,6 +301,7 @@ class Application(tk.Frame):
       
         self.setTreeviewCounts()
         #self.setExportEnableOrDisable()
+        self.writeToReport()
 
     # this is the main code for writing data to the treeview
     def writingToTree(self):
@@ -322,7 +358,6 @@ class Application(tk.Frame):
         self.treeview.insert(parent=parentNumber, iid=ranNum, index='end', text=str(file_["filename"]))
         for item in file_.items():
             self.treeview.insert(parent=ranNum, index='end', text=str(item))
-
 
 
     # This will clear the tree so when you scan again, the items in the tree will disappear
@@ -549,11 +584,56 @@ class Application(tk.Frame):
     def optionsButtonActions(self):
         pass
     
-    def setExportEnableOrDisable(self):
-        self.exportButton.config(state=tk.NORMAL)
+    # def setExportEnableOrDisable(self):
+    #     self.exportButton.config(state=tk.NORMAL)
     
+    def getIfAdmin(self):
+        scan = scanner.Scanner()
+        scan.checkIfAdmin()
+    
+    def writeToReport(self):
+        flagFile1 = ''
+        flagFile2 = ''
 
         
+        self.textReportBox.insert(tk.END, "We found files like '" + str(self.getFlaggedFile()) + "' and '" + str(self.getFlaggedFile())+"'")
+        self.textReportBox.insert(tk.END, "\nThese are going to be typical files that a bad actor could search for and easily find.")
+        
+        try:
+            email_data = self.getEmailsFromFlaggedFiles()
+            self.textReportBox.insert(tk.END, "\n\nWe even found " + str(email_data[0]) + " email(s) some of which include " + str(email_data[1]))
+        except:
+            self.textReportBox.insert(tk.END, "\n\nLuckily, there were no emails found.")
+
+        self.textReportBox.config(state=tk.DISABLED)
+
+    def getFlaggedFile(self):
+
+        flagged_files = []
+
+        for file_ in self.files_Global:
+            if file_['flag'] == True and file_["data"]["filename"] != "":
+                flagged_files.append(file_)
+        
+        try:
+            flagFile = choice(flagged_files)
+            return flagFile["filename"]
+        except:
+            return "NONE"
+    
+    def getEmailsFromFlaggedFiles(self):
+        emails_found = []
+        email_count = 0
+
+        for file_ in self.files_Global:
+            if file_["flag"] == True and file_["data"]["email"] != "":
+                emails_found.append(file_["data"]["email"])
+            else:
+                pass
+                
+        email_count = len(emails_found)
+        email_data = [email_count, str(choice(emails_found))]
+        return email_data
 
 app = Application(tk.Tk())
 app.root.mainloop()        
