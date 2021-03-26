@@ -1,6 +1,7 @@
 from pathlib import Path
 import re, pickle, os
-import pickle
+import pickle, win32net
+from time import sleep
 
 class Scanner:
    
@@ -35,7 +36,7 @@ class Scanner:
                 else: 
                     if i.is_file():
                         # creating a file dictionary of attributes
-                        fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":"", "cc":""}}
+                        fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":[], "cc":""}}
                         self.files.append(fileDict)
 
                     else:
@@ -48,7 +49,7 @@ class Scanner:
             else:
                 if i.is_file():
                     
-                    fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":""}}
+                    fileDict = {"filename":i.name,"pathParent":i.parents[0],"fullPath":i, "filetype":Path(i).suffix, "flag":False, "data":{"filename":"","filecontents":"","ssn":"","phone":"","email":[], "CC":""}}
                     self.files.append(fileDict)  
 
 
@@ -65,7 +66,7 @@ class Scanner:
         
         for file_ in self.files:
             if file_["filetype"] == ".txt":
-                print(file_["filename"])
+                
                 try: # trying to open the file, sometimes it won't read because it isn't always ascii characters. 
                     f = open(file_["fullPath"], "r")
                     fileContents = f.read()
@@ -127,7 +128,7 @@ class Scanner:
             return file_
 
     def emailSearch(self, file_, fileContents):
-        emailFound = re.findall(r'[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+', fileContents)
+        emailFound = re.findall(r'[A-Za-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+', fileContents)
 
         strEmailFound = ""
 
@@ -142,7 +143,7 @@ class Scanner:
                 file_["flag"] = True
             except:
                 pass
-            file_["data"]["email"] = file_["data"]["email"] + strEmailFound
+            file_["data"]["email"] += emailFound
            
             return file_
 
@@ -224,14 +225,14 @@ class Scanner:
 
         # Result handeling
         if is_admin == True:
-            print('You are an admin user!')
+            return True
         else:
-            print('You are not an admin user.')
-        print('You are in the following groups:')
-        for group in groups:
-            print(group)
+            return False
+        #print('You are in the following groups:')
+        # for group in groups:
+        #     print(group)
 
-        sleep(10)
+        #sleep(10)
         #if error: no module named win32api, run these lines in cmd
         #pip uninstall pipywin32
         #pip uninstall pywin32
@@ -245,6 +246,7 @@ class Scanner:
             self.files = [] # removing all data in the files list
             self.directory_file_iteration()
             self.checkFileNames()
+            
         else:
             self.getWordList()
             self.files = [] # removing all data in the files list

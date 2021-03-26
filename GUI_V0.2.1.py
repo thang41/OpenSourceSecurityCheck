@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, END, BOTH
 import time, string, timer, scanner, os, pickle
 from random import seed, random, choice
+from scanner import Scanner
 
 
 
@@ -12,6 +13,7 @@ class Application(tk.Frame):
     full_scan = False # for the popup message, but I commeneted out so no use atm
     files_Global = []
     keyWords_Global = []
+    isAdmin = False
 
     def __init__(self, root):
         self.root = root
@@ -301,6 +303,11 @@ class Application(tk.Frame):
       
         self.setTreeviewCounts()
         #self.setExportEnableOrDisable()
+        
+        # checks if user is on admin account or not
+        self.checkIfAdmin()
+
+        #this goes at bottom always
         self.writeToReport()
 
     # this is the main code for writing data to the treeview
@@ -592,6 +599,8 @@ class Application(tk.Frame):
         scan.checkIfAdmin()
     
     def writeToReport(self):
+        self.textReportBox.config(state=tk.NORMAL)
+        self.textReportBox.delete("1.0","end")
         flagFile1 = ''
         flagFile2 = ''
 
@@ -605,6 +614,10 @@ class Application(tk.Frame):
         except:
             self.textReportBox.insert(tk.END, "\n\nLuckily, there were no emails found.")
 
+        if self.isAdmin == True:
+            self.textReportBox.insert(tk.END, "\n\nYou are using an admin account. This is not good security practice because if someone were to get on your machine, \nthey would have higher privalage access to more information and abilities.\nTry creating a regular account and only using admin account when necessary!")
+        else:
+            self.textReportBox.insert(tk.END, "\n\nYou are not using an admin account, which is great!")
         self.textReportBox.config(state=tk.DISABLED)
 
     def getFlaggedFile(self):
@@ -626,14 +639,20 @@ class Application(tk.Frame):
         email_count = 0
 
         for file_ in self.files_Global:
-            if file_["flag"] == True and file_["data"]["email"] != "":
-                emails_found.append(file_["data"]["email"])
+            if file_["flag"] == True and len(file_["data"]["email"]) > 0:
+                for email in file_["data"]["email"]:
+                    emails_found.append(email)
             else:
                 pass
                 
         email_count = len(emails_found)
-        email_data = [email_count, str(choice(emails_found))]
-        return email_data
+        if email_count > 0:
+            email_data = [email_count, str(choice(emails_found))]
+            return email_data
+
+    def checkIfAdmin(self):
+        self.isAdmin = Scanner.checkIfAdmin(self)
+        
 
 app = Application(tk.Tk())
 app.root.mainloop()        
