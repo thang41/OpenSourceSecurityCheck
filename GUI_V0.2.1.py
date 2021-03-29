@@ -362,10 +362,22 @@ class Application(tk.Frame):
         #     self.treeview.insert(parent=parentNumber, index='end', text=str(file_["filename"]))
         # else:
         ranNum = random()
+        ranNum2 = random()
+        
         self.treeview.insert(parent=parentNumber, iid=ranNum, index='end', text=str(file_["filename"]))
         for item in file_.items():
-            self.treeview.insert(parent=ranNum, index='end', text=str(item))
-
+            if item[0] != "data":
+                self.treeview.insert(parent=ranNum, index='end', text=str(item))
+            if item[0] == "data":
+                self.treeview.insert(parent=ranNum, id=ranNum2 , index='end', text="File Data")
+                for key in file_["data"]:
+                    if len(file_["data"][key]) < 1:
+                        pass
+                    else:
+                        self.treeview.insert(parent=ranNum2, index='end', text= str(key) + ": " + str(file_["data"][key]))
+                    print(type(key))
+                    print("file data",file_["data"])
+                    
 
     # This will clear the tree so when you scan again, the items in the tree will disappear
     def clear_tree(self):
@@ -433,7 +445,7 @@ class Application(tk.Frame):
     # Options Menu popup
     def optionsMenu(self):
         popup = tk.Tk()
-        popup.title("Info")
+        popup.title("Options")
         popupWidth = 800
         popupHeight = 600
         screenWidth = self.root.winfo_screenwidth()
