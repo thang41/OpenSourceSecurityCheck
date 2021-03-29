@@ -369,12 +369,12 @@ class Application(tk.Frame):
             if item[0] != "data":
                 self.treeview.insert(parent=ranNum, index='end', text=str(item))
             if item[0] == "data":
-                self.treeview.insert(parent=ranNum, id=ranNum2 , index='end', text="File Data")
+                self.treeview.insert(parent=ranNum, id=ranNum2 , index='end', text="File Data", open=True)
                 for key in file_["data"]:
                     if len(file_["data"][key]) < 1:
                         pass
                     else:
-                        self.treeview.insert(parent=ranNum2, index='end', text= str(key) + ": " + str(file_["data"][key]))
+                        self.treeview.insert(parent=ranNum2, index='end', text= str(key) + ":   " + str(file_["data"][key]))
                     print(type(key))
                     print("file data",file_["data"])
                     
