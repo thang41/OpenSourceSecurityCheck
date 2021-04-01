@@ -204,11 +204,10 @@ class Application(tk.Frame):
             try:
                 self.onRight_menu.destroy()
             except Exception:
-                pass
-            
+                pass    
 
         delLabel.bind("<Button-1>", removeFromDir)
-    
+
 
     # This is to prevent infinite right click menus; it sees if there is an existing menu
     # and removes it, bringing it out in a new position.
@@ -374,10 +373,7 @@ class Application(tk.Frame):
                     if len(file_["data"][key]) < 1:
                         pass
                     else:
-                        self.treeview.insert(parent=ranNum2, index='end', text= str(key) + ":   " + str(file_["data"][key]))
-                    print(type(key))
-                    print("file data",file_["data"])
-                    
+                        self.treeview.insert(parent=ranNum2, index='end', text= str(key) + ":   " + str(file_["data"][key]))                 
 
     # This will clear the tree so when you scan again, the items in the tree will disappear
     def clear_tree(self):
@@ -402,7 +398,6 @@ class Application(tk.Frame):
 
     # This will add how many of a particular item was found and at it after the name such as "Text Files (4)" if it found 4 text files.
     def setTreeviewCounts(self):
-        
         
         num1 = len(self.treeview.get_children(1))
         num2 = len(self.treeview.get_children(2))
@@ -515,7 +510,6 @@ class Application(tk.Frame):
             for directory in ignoredType:
                 textBox3.insert(END, directory + "\n")
         
-        
         textBox.edit_modified(False)
         textBox2.edit_modified(False)
         textBox3.edit_modified(False)
@@ -541,7 +535,6 @@ class Application(tk.Frame):
         textBox.bind("<<Modified>>", on_click)
         textBox2.bind("<<Modified>>", on_click)
         textBox3.bind("<<Modified>>", on_click)
-
 
         def writeToWordListFile():
             try:
@@ -616,7 +609,6 @@ class Application(tk.Frame):
         flagFile1 = ''
         flagFile2 = ''
 
-        
         self.textReportBox.insert(tk.END, "We found files like '" + str(self.getFlaggedFile()) + "' and '" + str(self.getFlaggedFile())+"'")
         self.textReportBox.insert(tk.END, "\nThese are going to be typical files that a bad actor could search for and easily find.")
         
@@ -664,7 +656,6 @@ class Application(tk.Frame):
 
     def checkIfAdmin(self):
         self.isAdmin = Scanner.checkIfAdmin(self)
-        
 
 app = Application(tk.Tk())
 app.root.mainloop()        
