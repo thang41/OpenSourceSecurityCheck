@@ -10,10 +10,8 @@ Open-Source Security Check is an application that will scan a chosen directory f
 1. Open application
 2. Choose scan type
 3. Edit the scan parameters in the options menu
-    1. Add, edit, delete keywords
-    2. Add, edit, delete ignored directories
-    3. Add, edit, delete ignored filetypes
-        1. Add "none" to filter nonetype files
+    1. Add, edit, delete keywords, directories and filetypes to ignore
+        1. Add "none" to filter nonetype files in the ignored filetypes tab
 4. browse to directory
 5. Scan
 
