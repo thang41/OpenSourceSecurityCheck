@@ -1,6 +1,6 @@
 # Open-source Security Check
 
-![Preview](https://github.com/KillzMckinzie/OpenSourceSecurityCheck/blob/c4cb588d912a40edd9bd4ec0df3dacce56f0c661/Main%20screen.png)
+![Preview](https://github.com/KillzMckinzie/OpenSourceSecurityCheck/blob/861a73abd45cd65046b24564b0964a17a04c1a92/Images/Main%20screen.png)
 
 Open-Source Security Check is an application that will scan a chosen directory for sensitive information by using two different modes. Deep scan and quick scan. Quick scan will check filenames for senstive keywords that can be changed in the options menu. Deep scan will scan file names and filedata for sensitive information such as keywords, emails, credit card information, phone numbers and social-security numbers. 
 
