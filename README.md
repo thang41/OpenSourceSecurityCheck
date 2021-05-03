@@ -19,6 +19,10 @@ Open-Source Security Check is an application that will scan a chosen directory f
 
 Once the scan is complete, you will be presented with a treeview of all files scanned. These can be then filtered out by clicking the filter checkbox, and you will see just the files that have been flagged based on the criteria set. 
 
+# Example Scan
+
+![Example Scan](https://github.com/KillzMckinzie/OpenSourceSecurityCheck/blob/7e9bee7000edf060863d1ce0aac5c18f8c89e115/After%20Deep%20Scan.png)
+
 # Python
 Python 3.7.1 and greater
 
