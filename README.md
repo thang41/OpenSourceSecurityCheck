@@ -29,4 +29,4 @@ There is also a "report" that is generated. This was meant to be much more focus
 Python 3.7.1 and greater
 
 # Disclaimer
-I am not a developer, there will be useless code, errors, you may even question your sanity as to why I did something the way I did it. The code might be unreadable and hard to follow. It might not work perfectly or for all scenarios. 
+I am not a developer, there will be useless code and errors. You may even question your sanity as to why I did something the way I did it. The code might be unreadable and hard to follow at times. It might not work perfectly or for all scenarios. 
