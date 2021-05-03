@@ -1,4 +1,4 @@
-# Open-source Security Check
+# Open-Source Security Check
 
 ![Preview](https://github.com/KillzMckinzie/OpenSourceSecurityCheck/blob/861a73abd45cd65046b24564b0964a17a04c1a92/Images/Main%20screen.png)
 
