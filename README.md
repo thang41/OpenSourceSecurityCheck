@@ -19,7 +19,7 @@ Open-Source Security Check is an application that will scan a chosen directory f
 
 Once the scan is complete, you will be presented with a treeview of all files scanned. These can be then filtered out by clicking the flagged files checkbox, and you will see just the files that have been flagged based on the criteria set. It also checks to see if you're using an administrative account. 
 
-There is also a "report" that is generated. This was meant to be much more focused and less applicable to everyone. It is generic and will supply the same information after every scan. This was intended but not the original plan. It was originally mean to be unique depending on what sensitive information was found and ways to help hide/mitigate that to prevent a bad actor from finding it. 
+There is also a "report" that is generated. This was meant to be much more focused and less applicable to everyone. It is generic and will supply the same information after every scan. This was intended but not the original plan. It was originally meant to be unique depending on what sensitive information was found and ways to help hide/mitigate that to prevent a bad actor from finding it. 
 
 # Example Scan
 
