@@ -23,7 +23,7 @@ There is also a "report" that is generated. This was meant to be much more focus
 
 # Example Scan
 
-![Example Scan](https://github.com/KillzMckinzie/OpenSourceSecurityCheck/blob/7e9bee7000edf060863d1ce0aac5c18f8c89e115/After%20Deep%20Scan.png)
+![Example Scan](https://github.com/KillzMckinzie/OpenSourceSecurityCheck/blob/8ad1181e3853c527a93ecbd95dd65da8484da697/Images/After%20Deep%20Scan.png)
 
 # Python
 Python 3.7.1 and greater
