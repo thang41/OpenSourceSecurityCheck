@@ -26,7 +26,7 @@ There is also a "report" that is generated. This was meant to be much more focus
 ![Example Scan](https://github.com/KillzMckinzie/OpenSourceSecurityCheck/blob/8ad1181e3853c527a93ecbd95dd65da8484da697/Images/After%20Deep%20Scan.png)
 
 # Python
-Python 3.7.1 and greater
+Python 3.7.1 and 3.8.x
 
 # Disclaimer
 I am not a developer, there will be useless code and errors. You may even question your sanity as to why I did something the way I did it. The code might be unreadable and hard to follow at times. It might not work perfectly or for all scenarios. 
